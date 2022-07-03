@@ -9,7 +9,8 @@ dotenv.load_dotenv(dotenv.find_dotenv(), verbose=True)
 
 TOKEN = os.environ.get("discord_token")
 DISCORD_ROUTE_TOKEN = os.environ.get("discord_route_token")
-DEV_MODE = True
+DEV_MODE = os.environ.get("dev_mode")
+TICKET_BOT = 508391840525975553
 
 # setup logging
 file_handler = logging.FileHandler(filename="logs/error.log", mode="a")

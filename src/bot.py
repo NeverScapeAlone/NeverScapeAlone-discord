@@ -1,5 +1,6 @@
 from dis import disco
 import logging
+from re import L
 import discord
 import config
 import aiohttp
@@ -30,6 +31,15 @@ async def on_disconnect():
 
 @client.event
 async def on_message(message):
+    if message.author.id == config.TICKET_BOT:
+        await ticket_parser(message=message)
+        return
+
+    if message.author == client.user:
+        return
+
+
+async def ticket_parser(message):
     if len(message.mentions) == 1:
         login = discord = None
         discord = message.mentions[0]
@@ -47,46 +57,49 @@ async def on_message(message):
                 for field in response["fields"]:
                     if field["name"] == "Post your RSN Here":
                         login = field["value"]
+                        await verification_parser(
+                            channel=channel, discord=discord, login=login
+                        )
+                        return
 
-        if login is None and discord is None:
-            return
-        await channel.send(f"Verifying `{login}` for `{discord}`")
 
-        base = f"http://127.0.0.1:8000/"
-        if not config.DEV_MODE:
-            base = f"https://touchgrass.online/"
-
-        url_safe_discord = str(discord).replace("#", "%23")
-        append = f"V1/discord/verify?login={login}&discord={url_safe_discord}&token={config.DISCORD_ROUTE_TOKEN}"
-        route = base + append
-
-        async with aiohttp.ClientSession() as session:
-            async with session.get(route) as resp:
-                response = await resp.text()
-
-        response = json.loads(response)
-
-        response = response["detail"]
-
-        response_parser = {
-            "bad rsn": bad_rsn,
-            "bad discord": bad_discord,
-            "bad token": bad_token,
-            "no information": no_information,
-            "contact support": contact_support,
-            "already verified": already_verified,
-            "verified": verified,
-        }
-
-        await response_parser[response](channel=channel, discord=discord, login=login)
-
-    if message.author == client.user:
+async def verification_parser(channel, discord, login):
+    if login is None and discord is None:
         return
+    await channel.send(f"Verifying `{login}` for `{discord}`")
+
+    base = f"http://127.0.0.1:8000/"
+    if not config.DEV_MODE:
+        base = f"https://touchgrass.online/"
+
+    url_safe_discord = str(discord).replace("#", "%23")
+    append = f"V1/discord/verify?login={login}&discord={url_safe_discord}&token={config.DISCORD_ROUTE_TOKEN}"
+    route = base + append
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get(route) as resp:
+            response = await resp.text()
+
+    response = json.loads(response)
+    response = response["detail"]
+
+    response_parser = {
+        "bad rsn": bad_rsn,
+        "bad discord": bad_discord,
+        "bad token": bad_token,
+        "no information": no_information,
+        "contact support": contact_support,
+        "already verified": already_verified,
+        "verified": verified,
+    }
+
+    await response_parser[response](channel=channel, discord=discord, login=login)
+    return
 
 
 async def bad_rsn(channel, discord, login):
     await channel.send(
-        f"The RSN that you have entered is invalid. It does not match the regex pattern: [\w\d\s_-]{1,12}. Please make a new ticket to re-enter your RSN."
+        "The RSN that you have entered is invalid. It does not match the regex pattern: [\w\d\s_-]{1,12}. Please make a new ticket to re-enter your RSN."
     )
     return
 
@@ -131,6 +144,8 @@ async def verified(channel, discord, login):
         f"🎉  Your account has been verified! 🎉 \n"
         + "We hope that you enjoy the plugin. If you have any questions or concerns, please notify support. You are free to close the ticket."
     )
+    role = client.get_guild(channel.guild.id).get_role(992927728779153409)
+    await discord.add_roles(role)
 
 
 client.run(config.TOKEN)
