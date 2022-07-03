@@ -68,9 +68,8 @@ async def verification_parser(channel, discord, login):
         return
     await channel.send(f"Verifying `{login}` for `{discord}`")
 
-    base = f"http://127.0.0.1:8000/"
-    if not config.DEV_MODE:
-        base = f"http://touchgrass.online:5000/"
+    # base = f"http://127.0.0.1:8000/"
+    base = f"http://touchgrass.online:5000/"
 
     url_safe_discord = str(discord).replace("#", "%23")
     append = f"V1/discord/verify?login={login}&discord={url_safe_discord}&token={config.DISCORD_ROUTE_TOKEN}"
