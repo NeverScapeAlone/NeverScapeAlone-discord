@@ -10,7 +10,8 @@ jobs:
     - uses: actions/checkout@v2
     - name: Set Up ENV
       run: |
-          echo "${{ secrets.SQL_URI }}" > .env
+          echo "${{ secrets.DISCORD_TOKEN }}" > .env
+          echo "${{ secrets.DISCORD_ROUTE_TOKEN }}" >> .env
 
   deploy:
     runs-on: self-hosted
