@@ -9,8 +9,11 @@ dotenv.load_dotenv(dotenv.find_dotenv(), verbose=True)
 
 TOKEN = os.environ.get("discord_token")
 DISCORD_ROUTE_TOKEN = os.environ.get("discord_route_token")
-DEV_MODE = os.environ.get("dev_mode")
 TICKET_BOT = 508391840525975553
+GUILD_ID = 985750991846666284
+MATCH_CATEGORY = 993321356005486592
+BASE = "http://127.0.0.1:8000/"
+# BASE = "http://touchgrass.online:5000/"
 
 # setup logging
 file_handler = logging.FileHandler(filename="logs/error.log", mode="a")
