@@ -3,10 +3,8 @@ import logging
 import discord
 from discord.ext import tasks
 import config
-import aiohttp
 import json
 from functions import get_url, post_url
-import aioscheduler
 
 logger = logging.getLogger(__name__)
 
