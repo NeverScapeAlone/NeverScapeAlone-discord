@@ -12,7 +12,6 @@ jobs:
       run: |
           echo "${{ secrets.DISCORD_TOKEN }}" > .env
           echo "${{ secrets.DISCORD_ROUTE_TOKEN }}" >> .env
-          echo "${{ secrets.DEV_MODE }}" >> .env
 
   deploy:
     runs-on: self-hosted

@@ -1,10 +1,12 @@
 from dis import disco
 import logging
-from re import L
 import discord
+from discord.ext import tasks
 import config
 import aiohttp
 import json
+from functions import get_url, post_url
+import aioscheduler
 
 logger = logging.getLogger(__name__)
 
@@ -17,6 +19,7 @@ async def on_ready():
         f"{client.user} has connected to Discord!"
     )
     logger.info(f"{client.user} has connected to Discord!")
+    manage_channels.start()
 
 
 @client.event
@@ -37,6 +40,63 @@ async def on_message(message):
 
     if message.author == client.user:
         return
+
+
+@tasks.loop(seconds=5)
+async def manage_channels():
+    route = (
+        config.BASE
+        + f"V1/discord/get-active-matches?token={config.DISCORD_ROUTE_TOKEN}"
+    )
+
+    response = await get_url(route=route)
+
+    if "detail" in response.keys():
+        logging.warning(response["detail"])
+        return
+
+    active_parties = response["parties"]
+    matches = client.get_channel(config.MATCH_CATEGORY).channels
+    match_names = [match.name for match in matches]
+
+    if len(active_parties) > 0:
+        for party, invite in active_parties:
+            if party in match_names:
+                continue
+            await client.get_channel(config.MATCH_CATEGORY).create_voice_channel(party)
+
+    if len(active_parties) == 0:
+        for match in matches:
+            await client.get_channel(match.id).delete(reason="Match No Longer Active.")
+        return
+
+    parties, invites = list(zip(*active_parties))
+    party_invites = dict(zip(parties, invites))
+
+    sub_payload = []
+    for match in matches:
+        temp_dict = dict()
+        if match.name not in parties:
+            await client.get_channel(match.id).delete(reason="Match No Longer Active.")
+        else:
+            if party_invites[match.name] == None:
+                invite = await client.get_channel(match.id).create_invite(
+                    max_age=1800,
+                    max_uses=0,
+                    unique=False,
+                    reason="No previous invite created.",
+                )
+                temp_dict["party_identifier"] = match.name
+                temp_dict["discord_invite"] = str(invite)
+                sub_payload.append(temp_dict)
+
+    if len(sub_payload) == 0:
+        return
+    payload = dict()
+    payload["invite_pairs"] = sub_payload
+    data = json.dumps(payload)
+    route = config.BASE + f"V1/discord/post-invites?token={config.DISCORD_ROUTE_TOKEN}"
+    await post_url(route=route, data=data)
 
 
 async def ticket_parser(message):
@@ -68,18 +128,11 @@ async def verification_parser(channel, discord, login):
         return
     await channel.send(f"Verifying `{login}` for `{discord}`")
 
-    # base = f"http://127.0.0.1:8000/"
-    base = f"http://touchgrass.online:5000/"
-
     url_safe_discord = str(discord).replace("#", "%23")
     append = f"V1/discord/verify?login={login}&discord={url_safe_discord}&token={config.DISCORD_ROUTE_TOKEN}"
-    route = base + append
+    route = config.BASE + append
 
-    async with aiohttp.ClientSession() as session:
-        async with session.get(route) as resp:
-            response = await resp.text()
-
-    response = json.loads(response)
+    response = await get_url(route)
     response = response["detail"]
 
     response_parser = {
@@ -143,7 +196,7 @@ async def verified(channel, discord, login):
         f"🎉  Your account has been verified! 🎉 \n"
         + "We hope that you enjoy the plugin. If you have any questions or concerns, please notify support. You are free to close the ticket."
     )
-    role = client.get_guild(channel.guild.id).get_role(992927728779153409)
+    role = client.get_guild(config.GUILD_ID).get_role(992927728779153409)
     await discord.add_roles(role)
 
 
