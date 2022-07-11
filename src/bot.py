@@ -172,7 +172,17 @@ async def no_information(channel, discord, login):
     await channel.send(
         f"We do not have information regarding this account. Are you sure that you have:\n"
         + f"1. Entered your Discord in the format of `{discord}` in your plugin panel.\n"
-        + f"2. Entered your RSN EXACTLY as displayed in-game? This includes underscores where needed, spaces where needed, and capitalizations?"
+        + f"2. Entered your RSN EXACTLY as displayed in-game? This includes underscores where needed, spaces where needed, and capitalizations?\n"
+        + f"Make sure that you do the following:\n"
+        + f"1. Open your Plugin Configuration (Wrench Icon in the Top Right of RuneLite)\n"
+        + f"2. Search 'NeverScapeAlone'\n"
+        + f"3. Click the Gear in NeverScapeAlone (Edit Plugin Configuration)\n"
+        + f"4. In the 'Discord Username' field, enter `{discord}`.\n"
+        + f"5. Turn your Plugin OFF and then ON. (Disable and then Enable NeverScapeAlone).\n"
+        + f"6. You should see 'SUCCESSFULLY REGISTERED'.\n"
+        + f"7. Close this ticket.\n"
+        + f"8. Make a new ticket with your RSN, as before.\n"
+        + f"Note: If you continue to have issues verifying your account, double check that you've entered in your data correctly, try again, then contact support.\n"
     )
     return
 
