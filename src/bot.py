@@ -18,6 +18,7 @@ async def on_ready():
     )
     logger.info(f"{client.user} has connected to Discord!")
     manage_channels.start()
+    run_queues.start()
 
 
 @client.event
@@ -69,6 +70,7 @@ async def run_active_queues():
     else:
         for activity in response:
             count = response[activity]
+            activity = activity.replace("_", " ").title()
             embed.add_field(name=activity, value=count, inline=False)
 
     if len(messages) > 0:
@@ -80,10 +82,13 @@ async def run_active_queues():
     return
 
 
-@tasks.loop(seconds=5)
-async def manage_channels():
+@tasks.loop(seconds=10)
+async def run_queues():
     await run_active_queues()
 
+
+@tasks.loop(seconds=5)
+async def manage_channels():
     route = (
         config.BASE
         + f"V1/discord/get-active-matches?token={config.DISCORD_ROUTE_TOKEN}"
