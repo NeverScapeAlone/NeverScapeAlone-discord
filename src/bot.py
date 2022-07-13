@@ -41,16 +41,23 @@ async def on_message(message):
 
 
 async def run_active_queues():
-    route = (
+    queue_route = (
         config.BASE + f"V1/discord/get-active-queues?token={config.DISCORD_ROUTE_TOKEN}"
     )
+    connections_route = config.BASE + f"V1/server-status/connections"
 
-    response = await get_url(route=route)
+    response = await get_url(route=queue_route)
+    connections = await get_url(route=connections_route)
     channel = client.get_channel(config.ACTIVE_QUEUES_CHANNEL)
     messages = await channel.history(limit=5).flatten()
 
     embed = discord.Embed(
         title="Active Queues", description=f"Updated: <t:{int(time.time())}:R>"
+    )
+    minute_connections = connections["minute_connections"]
+    hour_connections = connections["hour_connections"]
+    embed = embed.set_footer(
+        text=f"Active Users: {minute_connections} | Past Hour: {hour_connections}"
     )
 
     if "detail" in response.keys():
