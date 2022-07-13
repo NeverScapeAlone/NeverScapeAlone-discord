@@ -1,9 +1,9 @@
-from dis import disco
 import logging
 import discord
 from discord.ext import tasks
 import config
 import json
+import time
 from functions import get_url, post_url
 
 logger = logging.getLogger(__name__)
@@ -40,8 +40,43 @@ async def on_message(message):
         return
 
 
+async def run_active_queues():
+    route = (
+        config.BASE + f"V1/discord/get-active-queues?token={config.DISCORD_ROUTE_TOKEN}"
+    )
+
+    response = await get_url(route=route)
+    channel = client.get_channel(config.ACTIVE_QUEUES_CHANNEL)
+    messages = await channel.history(limit=5).flatten()
+
+    embed = discord.Embed(
+        title="Active Queues", description=f"Updated: <t:{int(time.time())}:R>"
+    )
+
+    if "detail" in response.keys():
+        if response["detail"] == "bad token":
+            logging.warning(response["detail"])
+            return
+        if response["detail"] == "no information":
+            embed.add_field(name="Active Queues", value="None", inline=False)
+    else:
+        for activity in response:
+            count = response[activity]
+            embed.add_field(name=activity, value=count, inline=False)
+
+    if len(messages) > 0:
+        message = messages[0]
+        await message.edit(embed=embed)
+        return
+
+    await channel.send(embed=embed)
+    return
+
+
 @tasks.loop(seconds=5)
 async def manage_channels():
+    await run_active_queues()
+
     route = (
         config.BASE
         + f"V1/discord/get-active-matches?token={config.DISCORD_ROUTE_TOKEN}"
