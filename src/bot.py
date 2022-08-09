@@ -232,6 +232,7 @@ async def no_information(channel, discord, login):
     await channel.send(
         f"We do not have information regarding this account. Are you sure that you have:\n"
         + f"1. Entered your RSN EXACTLY as displayed in-game? This includes underscores where needed, spaces where needed, and capitalizations?\n"
+        + f"2. Toggled ON the `Discord` plugin and then restarted your RuneLite?\n"
         + f"Note: If you continue to have issues verifying your account, double check that you've entered in your data correctly, try again, then contact support.\n"
     )
     return
