@@ -1,14 +1,25 @@
+from dis import dis
 import logging
 import discord
 from discord.ext import tasks
 import config
 import json
+from typing import List, Optional, Text
 import time
 from functions import get_url, post_url
+from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
 
 client = discord.Client()
+
+
+class active_match_discord(BaseModel):
+    """active match model"""
+
+    discord_invite: Optional[str]
+    player_count: Optional[int]
+    ID: str
 
 
 @client.event
@@ -17,8 +28,8 @@ async def on_ready():
         f"{client.user} has connected to Discord!"
     )
     logger.info(f"{client.user} has connected to Discord!")
-    manage_channels.start()
     run_queues.start()
+    manage_channels.start()
 
 
 @client.event
@@ -45,28 +56,23 @@ async def run_active_queues():
     queue_route = (
         config.BASE + f"V1/discord/get-active-queues?token={config.DISCORD_ROUTE_TOKEN}"
     )
-    connections_route = config.BASE + f"V1/server-status/connections"
 
     response = await get_url(route=queue_route)
-    connections = await get_url(route=connections_route)
+    if response is None:
+        return
+
     channel = client.get_channel(config.ACTIVE_QUEUES_CHANNEL)
     messages = await channel.history(limit=5).flatten()
 
     embed = discord.Embed(
-        title="Active Queues", description=f"Updated: <t:{int(time.time())}:R>"
+        title="Public Matches", description=f"Updated: <t:{int(time.time())}:R>"
     )
-    minute_connections = connections["minute_connections"]
-    hour_connections = connections["hour_connections"]
-    embed = embed.set_footer(
-        text=f"Active Users: {minute_connections} | Past Hour: {hour_connections}"
-    )
-
     if "detail" in response.keys():
         if response["detail"] == "bad token":
             logging.warning(response["detail"])
             return
         if response["detail"] == "no information":
-            embed.add_field(name="Active Queues", value="None", inline=False)
+            embed.add_field(name="Public Matches", value="None", inline=False)
     else:
         for activity in response:
             count = response[activity]
@@ -89,33 +95,41 @@ async def run_queues():
 
 @tasks.loop(seconds=5)
 async def manage_channels():
+    matches = client.get_channel(config.MATCH_CATEGORY).channels
+    match_names = [match.name for match in matches]
+
     route = (
         config.BASE
         + f"V1/discord/get-active-matches?token={config.DISCORD_ROUTE_TOKEN}"
     )
 
     response = await get_url(route=route)
+    response = json.dumps(response)
+    response = json.loads(response)
+    response = response["active_matches_discord"]
 
-    if "detail" in response.keys():
-        logging.warning(response["detail"])
-        return
-
-    active_parties = response["parties"]
-    matches = client.get_channel(config.MATCH_CATEGORY).channels
-    match_names = [match.name for match in matches]
-
-    if len(active_parties) > 0:
-        for party, invite in active_parties:
-            if party in match_names:
-                continue
-            await client.get_channel(config.MATCH_CATEGORY).create_voice_channel(party)
-
-    if len(active_parties) == 0:
+    if not response:
         for match in matches:
             await client.get_channel(match.id).delete(reason="Match No Longer Active.")
         return
 
-    parties, invites = list(zip(*active_parties))
+    active_matches = [
+        active_match_discord.parse_obj(active_match) for active_match in response
+    ]
+
+    if active_matches:
+        for active_match in active_matches:
+            party = active_match.ID
+            if party in match_names:
+                continue
+            await client.get_channel(config.MATCH_CATEGORY).create_voice_channel(party)
+    else:
+        for match in matches:
+            await client.get_channel(match.id).delete(reason="Match No Longer Active.")
+        return
+
+    parties = [active_match.ID for active_match in active_matches]
+    invites = [active_match.discord_invite for active_match in active_matches]
     party_invites = dict(zip(parties, invites))
 
     sub_payload = []
@@ -126,19 +140,19 @@ async def manage_channels():
         else:
             if party_invites[match.name] == None:
                 invite = await client.get_channel(match.id).create_invite(
-                    max_age=1800,
+                    max_age=3600,
                     max_uses=0,
                     unique=False,
                     reason="No previous invite created.",
                 )
-                temp_dict["party_identifier"] = match.name
+                temp_dict["ID"] = match.name
                 temp_dict["discord_invite"] = str(invite)
                 sub_payload.append(temp_dict)
 
-    if len(sub_payload) == 0:
+    if not sub_payload:
         return
     payload = dict()
-    payload["invite_pairs"] = sub_payload
+    payload["invites"] = sub_payload
     data = json.dumps(payload)
     route = config.BASE + f"V1/discord/post-invites?token={config.DISCORD_ROUTE_TOKEN}"
     await post_url(route=route, data=data)
@@ -173,8 +187,7 @@ async def verification_parser(channel, discord, login):
         return
     await channel.send(f"Verifying `{login}` for `{discord}`")
 
-    url_safe_discord = str(discord).replace("#", "%23")
-    append = f"V1/discord/verify?login={login}&discord={url_safe_discord}&token={config.DISCORD_ROUTE_TOKEN}"
+    append = f"V1/discord/verify?login={login}&discord_id={discord.id}&token={config.DISCORD_ROUTE_TOKEN}"
     route = config.BASE + append
 
     response = await get_url(route)
@@ -218,17 +231,7 @@ async def bad_token(channel, discord, login):
 async def no_information(channel, discord, login):
     await channel.send(
         f"We do not have information regarding this account. Are you sure that you have:\n"
-        + f"1. Entered your Discord in the format of `{discord}` in your plugin panel.\n"
-        + f"2. Entered your RSN EXACTLY as displayed in-game? This includes underscores where needed, spaces where needed, and capitalizations?\n"
-        + f"Make sure that you do the following:\n"
-        + f"1. Open your Plugin Configuration (Wrench Icon in the Top Right of RuneLite)\n"
-        + f"2. Search 'NeverScapeAlone'\n"
-        + f"3. Click the Gear in NeverScapeAlone (Edit Plugin Configuration)\n"
-        + f"4. In the 'Discord Username' field, enter `{discord}`.\n"
-        + f"5. Turn your Plugin OFF and then ON. (Disable and then Enable NeverScapeAlone).\n"
-        + f"6. You should see 'SUCCESSFULLY REGISTERED'.\n"
-        + f"7. Close this ticket.\n"
-        + f"8. Make a new ticket with your RSN, as before.\n"
+        + f"1. Entered your RSN EXACTLY as displayed in-game? This includes underscores where needed, spaces where needed, and capitalizations?\n"
         + f"Note: If you continue to have issues verifying your account, double check that you've entered in your data correctly, try again, then contact support.\n"
     )
     return
