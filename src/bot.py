@@ -140,7 +140,7 @@ async def manage_channels():
         else:
             if party_invites[match.name] == None:
                 invite = await client.get_channel(match.id).create_invite(
-                    max_age=3600,
+                    max_age=21600,
                     max_uses=0,
                     unique=False,
                     reason="No previous invite created.",
