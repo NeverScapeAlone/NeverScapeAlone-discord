@@ -230,10 +230,18 @@ async def bad_token(channel, discord, login):
 
 async def no_information(channel, discord, login):
     await channel.send(
-        f"We do not have information regarding this account. Are you sure that you have:\n"
-        + f"1. Entered your RSN EXACTLY as displayed in-game? This includes underscores where needed, spaces where needed, and capitalizations?\n"
-        + f"2. Toggled ON the `Discord` plugin and then restarted your RuneLite?\n"
+        f"We do not have information regarding this account. Follow these steps!\n"
+        + f"1. Log out and close RuneLite.\n"
+        + f"2. Turn ON your discord desktop app, so that discord is running on your PC.\n"
+        + f"3. Relaunch RuneLite.\n"
+        + f"4. Go to the `Search` bar, type in `*` and press `Enter` on your keyboard.\n"
+        + f"5. Even if no matches were found, your discord ID should have been sent to the server during this process.\n"
+        + f"6. Close this ticket.\n"
+        + f"7. Create a new Verify Account ticket.\n"
+        + f"8. Enter your RSN EXACTLY as displayed in-game. This includes underscores where needed, spaces where needed, and capitalizations.\n"
         + f"Note: If you continue to have issues verifying your account, double check that you've entered in your data correctly, try again, then contact support.\n"
+        + f"\n"
+        + f"If the issue still has not resolved. Please send your `client.log` file in the ticket. You can find this file by going to `.runelite > logs > client.log`."
     )
     return
 
