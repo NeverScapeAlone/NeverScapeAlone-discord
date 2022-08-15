@@ -8,6 +8,7 @@ import discord
 from discord.ext import commands
 from src.functions import get_url, post_url, check_match_id
 from discord.ext.commands import Context, Cog
+from discord import app_commands
 import src.config as config
 
 logger = logging.getLogger(__name__)
@@ -78,6 +79,16 @@ class utilCommands(Cog):
         )
         response = await get_url(route=route)
         await ctx.reply(response)
+
+    @commands.command(name="logs")
+    async def logs(self, interaction: discord.Interaction):
+        response = (
+            "To find the `logs`, you can **do one of the following**:\n"
+            + "- If your client failed to open, click the `Open logs folder` button.\n"
+            + "- Open the screenshot directory by right-clicking 📷 `Camera button`, navigate 1 directory up, then open `logs` folder.\n"
+            + "- Navigate to `%userprofile%\.runelite\logs` on **Windows** or `$HOME/.runelite/logs` on **Linux** and **macOS**.\n"
+        )
+        await interaction.response.send_message(response, ephemeral=True)
 
     @commands.command(name="meow")
     async def meow(self, ctx: Context):
