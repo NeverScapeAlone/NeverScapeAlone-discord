@@ -19,4 +19,5 @@ jobs:
     steps:
       - name: Docker
         run: |
+          apt-get install -y git
           sudo docker-compose up --build -d
