@@ -15,7 +15,7 @@ charset-normalizer==2.0.11
 click==8.0.3
 colorama==0.4.4
 cryptography==36.0.1
-discord==1.7.3
+discord.py @ git+https://github.com/Rapptz/discord.py@868476c99963e72aa529ed6203f86ef529a2c1f1
 discord-webhook==0.14.0
 discord.py==1.7.3
 fastapi==0.73.0

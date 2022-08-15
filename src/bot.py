@@ -1,12 +1,13 @@
-from dis import dis
 import logging
 import discord
 from discord.ext import tasks
+from discord.app_commands import checks, MissingPermissions
 import config
 import json
 from typing import List, Optional, Text
 import time
 from functions import get_url, post_url
+
 from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
@@ -38,19 +39,21 @@ async def on_connect():
 
 
 @client.event
-async def on_disconnect():
-    logger.info("Bot disconnected.")
-
-
-@client.event
 async def on_message(message):
     if message.author.id == config.TICKET_BOT:
         await ticket_parser(message=message)
         return
 
+    print(message.author.roles)
+    if config.MATCH_MODERATOR in message.author.roles:
+        print("hello!")
+
     if message.author == client.user:
         return
 
+
+@tree.command(...)
+@checks.has_permissions(administrator=True, ...)
 
 async def run_active_queues():
     queue_route = (
@@ -87,13 +90,12 @@ async def run_active_queues():
     await channel.send(embed=embed)
     return
 
-
-@tasks.loop(seconds=10)
+@tasks.loop(seconds=20)
 async def run_queues():
     await run_active_queues()
 
 
-@tasks.loop(seconds=5)
+@tasks.loop(seconds=10)
 async def manage_channels():
     matches = client.get_channel(config.MATCH_CATEGORY).channels
     match_names = [match.name for match in matches]
