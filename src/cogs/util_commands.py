@@ -43,6 +43,7 @@ class utilCommands(Cog):
 
     @commands.command(name="poke")
     async def poke(self, ctx: Context):
+        """Poke the server to determine latency"""
         debug = {
             "author": ctx.author.name,
             "author_id": ctx.author.id,
@@ -65,6 +66,7 @@ class utilCommands(Cog):
 
     @commands.command(name="whois")
     async def whois(self, ctx: Context, *login: str):
+        """Finding the discord username of a player's RSN in-game."""
         login = " ".join(list(login))
         if not login:
             await ctx.reply("You must enter an RSN.")
@@ -81,20 +83,58 @@ class utilCommands(Cog):
         await ctx.reply(response)
 
     @commands.command(name="logs")
-    async def logs(self, interaction: discord.Interaction):
+    async def logs(self, ctx: Context):
+        """Tips on how to access your client.log file"""
         response = (
             "To find the `logs`, you can **do one of the following**:\n"
             + "- If your client failed to open, click the `Open logs folder` button.\n"
             + "- Open the screenshot directory by right-clicking 📷 `Camera button`, navigate 1 directory up, then open `logs` folder.\n"
             + "- Navigate to `%userprofile%\.runelite\logs` on **Windows** or `$HOME/.runelite/logs` on **Linux** and **macOS**.\n"
         )
-        await interaction.response.send_message(response, ephemeral=True)
+        embed = discord.Embed(title="Submitting your `client.log` file.")
+        embed = embed.add_field(name="Finding your client.log file", value=response)
+        await ctx.reply(embed=embed)
+
+    @commands.command(name="report")
+    async def report(self, ctx: Context):
+        """Report another player, or an issue with your match."""
+        embed = discord.Embed(title="Report another Player")
+        embed.add_field(
+            name="Submitting via Discord",
+            value="To report another player, please visit our support channel <#992457386189144074> and `Submit A Concern`.",
+            inline=False,
+        )
+        embed.add_field(
+            name="Jagex Rule Broken",
+            value="If an in-game rule has been broken, please report these players in-game.",
+            inline=False,
+        )
+        embed.add_field(
+            name="Scamming/Theft of Items",
+            value="In addition to reporting a player in-game, please submit a runewatch case here: https://runewatch.com/",
+            inline=False,
+        )
+        await ctx.reply(embed=embed)
+
+    @commands.command(name="bug")
+    async def bug(self, ctx: Context):
+        """Report a bug, or an issue with your plugin."""
+        embed = discord.Embed(title="Bug Report")
+        embed.add_field(
+            name="Submitting via Discord",
+            value="To submit a bug, please visit our support channel <#992457386189144074> and click `Submit Bug Report`.",
+            inline=False,
+        )
+        embed.add_field(
+            name="Submitting via Github",
+            value="You can also go to our github and submit an issue: https://github.com/NeverScapeAlone/never-scape-alone/issues",
+            inline=False,
+        )
+        await ctx.reply(embed=embed)
 
     @commands.command(name="meow")
     async def meow(self, ctx: Context):
-        """
-        Send a random cat image.
-        """
+        """Send a random cat image."""
         debug = {
             "author": ctx.author.name,
             "author_id": ctx.author.id,

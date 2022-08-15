@@ -42,7 +42,6 @@ class matchCommands(Cog):
         await ctx.reply(response)
 
     @commands.command(name="info")
-    @checks.has_role(config.MATCH_MODERATOR)
     async def info(self, ctx: Context, match_id: str = None):
         if not await check_match_id(match_id=match_id):
             await ctx.reply("Invalid Match ID format")
