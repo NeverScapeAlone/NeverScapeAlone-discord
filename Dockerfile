@@ -6,4 +6,4 @@ COPY . /code/
 EXPOSE 6000
 
 RUN pip install -r requirements.txt
-CMD ["python","src/bot.py"] 
+CMD ["uvicorn", "src.main:app", "--proxy-headers", "--host", "0.0.0.0"]

@@ -1,61 +1,65 @@
-import logging
-import discord
-from discord.ext import tasks
-from discord.app_commands import checks, MissingPermissions
-import config
 import json
-from typing import List, Optional, Text
+import logging
 import time
-from functions import get_url, post_url
+from typing import List, Optional, Text
 
+import aiohttp
+import discord
+from discord.app_commands import checks, commands, tree
+from discord.ext import tasks
+from discord.ext.commands import Bot
 from pydantic import BaseModel
+
+import src.models as models
+from src import config
+from src.functions import get_url, post_url, check_match_id
+from src.cogs.util_commands import utilCommands
+from src.cogs.verification_commands import verificationCommands
+from src.cogs.match_commands import matchCommands
 
 logger = logging.getLogger(__name__)
 
-client = discord.Client()
+activity = discord.Game("Old School RuneScape", type=discord.ActivityType.watching)
+allowed_mentions = discord.AllowedMentions(everyone=False, roles=False, users=True)
+intents = discord.Intents(
+    messages=True, guilds=True, members=True, reactions=True, message_content=True
+)
 
 
-class active_match_discord(BaseModel):
-    """active match model"""
+bot: discord.Client = Bot(
+    allowed_mentions=allowed_mentions,
+    command_prefix=config.COMMAND_PREFIX,
+    description="Matching Players!",
+    case_insensitive=True,
+    activity=activity,
+    intents=intents,
+)
 
-    discord_invite: Optional[str]
-    player_count: Optional[int]
-    ID: str
 
-
-@client.event
+@bot.event
 async def on_ready():
-    await client.get_channel(985750992891043890).send(
-        f"{client.user} has connected to Discord!"
-    )
-    logger.info(f"{client.user} has connected to Discord!")
-    run_queues.start()
-    manage_channels.start()
+    logger.info(f"We have logged in as {bot.user}")
+    bot.Session = aiohttp.ClientSession()
+    await bot.add_cog(utilCommands(bot))
+    await bot.add_cog(verificationCommands(bot))
+    await bot.add_cog(matchCommands(bot))
+    # run_queues.start()
+    # manage_channels.start()
 
 
-@client.event
+@bot.event
 async def on_connect():
     logger.info("Bot connected successfully.")
+    logger.info(f"{config.COMMAND_PREFIX=}")
 
 
-@client.event
-async def on_message(message):
-    if message.author.id == config.TICKET_BOT:
-        await ticket_parser(message=message)
-        return
-
-    print(message.author.roles)
-    if config.MATCH_MODERATOR in message.author.roles:
-        print("hello!")
-
-    if message.author == client.user:
-        return
+@bot.event
+async def on_disconnect():
+    logger.info("Bot disconnected.")
 
 
-@tree.command(...)
-@checks.has_permissions(administrator=True, ...)
-
-async def run_active_queues():
+@tasks.loop(seconds=20)
+async def run_queues():
     queue_route = (
         config.BASE + f"V1/discord/get-active-queues?token={config.DISCORD_ROUTE_TOKEN}"
     )
@@ -64,8 +68,11 @@ async def run_active_queues():
     if response is None:
         return
 
-    channel = client.get_channel(config.ACTIVE_QUEUES_CHANNEL)
-    messages = await channel.history(limit=5).flatten()
+    channel = bot.get_channel(config.ACTIVE_QUEUES_CHANNEL)
+    message_iterator = channel.history(limit=5)
+    messages = []
+    async for message in message_iterator:
+        messages.append(message)
 
     embed = discord.Embed(
         title="Public Matches", description=f"Updated: <t:{int(time.time())}:R>"
@@ -90,14 +97,10 @@ async def run_active_queues():
     await channel.send(embed=embed)
     return
 
-@tasks.loop(seconds=20)
-async def run_queues():
-    await run_active_queues()
-
 
 @tasks.loop(seconds=10)
 async def manage_channels():
-    matches = client.get_channel(config.MATCH_CATEGORY).channels
+    matches = bot.get_channel(config.MATCH_CATEGORY).channels
     match_names = [match.name for match in matches]
 
     route = (
@@ -112,11 +115,11 @@ async def manage_channels():
 
     if not response:
         for match in matches:
-            await client.get_channel(match.id).delete(reason="Match No Longer Active.")
+            await bot.get_channel(match.id).delete(reason="Match No Longer Active.")
         return
 
     active_matches = [
-        active_match_discord.parse_obj(active_match) for active_match in response
+        models.active_match_discord.parse_obj(active_match) for active_match in response
     ]
 
     if active_matches:
@@ -124,10 +127,10 @@ async def manage_channels():
             party = active_match.ID
             if party in match_names:
                 continue
-            await client.get_channel(config.MATCH_CATEGORY).create_voice_channel(party)
+            await bot.get_channel(config.MATCH_CATEGORY).create_voice_channel(party)
     else:
         for match in matches:
-            await client.get_channel(match.id).delete(reason="Match No Longer Active.")
+            await bot.get_channel(match.id).delete(reason="Match No Longer Active.")
         return
 
     parties = [active_match.ID for active_match in active_matches]
@@ -138,10 +141,10 @@ async def manage_channels():
     for match in matches:
         temp_dict = dict()
         if match.name not in parties:
-            await client.get_channel(match.id).delete(reason="Match No Longer Active.")
+            await bot.get_channel(match.id).delete(reason="Match No Longer Active.")
         else:
             if party_invites[match.name] == None:
-                invite = await client.get_channel(match.id).create_invite(
+                invite = await bot.get_channel(match.id).create_invite(
                     max_age=21600,
                     max_uses=0,
                     unique=False,
@@ -158,115 +161,3 @@ async def manage_channels():
     data = json.dumps(payload)
     route = config.BASE + f"V1/discord/post-invites?token={config.DISCORD_ROUTE_TOKEN}"
     await post_url(route=route, data=data)
-
-
-async def ticket_parser(message):
-    if len(message.mentions) == 1:
-        login = discord = None
-        discord = message.mentions[0]
-        channel = client.get_channel(message.channel.id)
-        messages = await channel.history(limit=5).flatten()
-
-        for msg in messages:
-            embeds = msg.embeds
-            if len(embeds) == 0:
-                continue
-            for embed in embeds:
-                response = embed.to_dict()
-                if "fields" not in response.keys():
-                    continue
-                for field in response["fields"]:
-                    if field["name"] == "Post your RSN Here":
-                        login = field["value"]
-                        await verification_parser(
-                            channel=channel, discord=discord, login=login
-                        )
-                        return
-
-
-async def verification_parser(channel, discord, login):
-    if login is None and discord is None:
-        return
-    await channel.send(f"Verifying `{login}` for `{discord}`")
-
-    append = f"V1/discord/verify?login={login}&discord_id={discord.id}&token={config.DISCORD_ROUTE_TOKEN}"
-    route = config.BASE + append
-
-    response = await get_url(route)
-    response = response["detail"]
-
-    response_parser = {
-        "bad rsn": bad_rsn,
-        "bad discord": bad_discord,
-        "bad token": bad_token,
-        "no information": no_information,
-        "contact support": contact_support,
-        "already verified": already_verified,
-        "verified": verified,
-    }
-
-    await response_parser[response](channel=channel, discord=discord, login=login)
-    return
-
-
-async def bad_rsn(channel, discord, login):
-    await channel.send(
-        "The RSN that you have entered is invalid. It does not match the regex pattern: [\w\d\s_-]{1,12}. Please make a new ticket to re-enter your RSN."
-    )
-    return
-
-
-async def bad_discord(channel, discord, login):
-    await channel.send(
-        f"Your discord pattern is invalid. Support will be contacted, as they will need to check your logs. <@178965680266149888>"
-    )
-    return
-
-
-async def bad_token(channel, discord, login):
-    await channel.send(
-        f"The token provided is invalid. This should not happen, unless you are running a bootleg version of the discord bot, or the server owners have not provided the correct key. <@178965680266149888>"
-    )
-    return
-
-
-async def no_information(channel, discord, login):
-    await channel.send(
-        f"We do not have information regarding this account. Follow these steps!\n"
-        + f"1. Log out and close RuneLite.\n"
-        + f"2. Turn ON your discord desktop app, so that discord is running on your PC.\n"
-        + f"3. Relaunch RuneLite.\n"
-        + f"4. Go to the `Search` bar, type in `*` and press `Enter` on your keyboard.\n"
-        + f"5. Even if no matches were found, your discord ID should have been sent to the server during this process.\n"
-        + f"6. Close this ticket.\n"
-        + f"7. Create a new Verify Account ticket.\n"
-        + f"8. Enter your RSN EXACTLY as displayed in-game. This includes underscores where needed, spaces where needed, and capitalizations.\n"
-        + f"Note: If you continue to have issues verifying your account, double check that you've entered in your data correctly, try again, then contact support.\n"
-        + f"\n"
-        + f"If the issue still has not resolved. Please send your `client.log` file in the ticket. You can find this file by going to `.runelite > logs > client.log`."
-    )
-    return
-
-
-async def contact_support(channel, discord, login):
-    await channel.send(
-        f"Unfortunately, something went wrong on our end. Support has been alerted. <@178965680266149888>"
-    )
-
-
-async def already_verified(channel, discord, login):
-    await channel.send(
-        f"Your account has already been verified for {discord} and {login}. If you believe this to be in error, please contact support. Thank you!"
-    )
-
-
-async def verified(channel, discord, login):
-    await channel.send(
-        f"🎉  Your account has been verified! 🎉 \n"
-        + "We hope that you enjoy the plugin. If you have any questions or concerns, please notify support. You are free to close the ticket."
-    )
-    role = client.get_guild(config.GUILD_ID).get_role(992927728779153409)
-    await discord.add_roles(role)
-
-
-client.run(config.TOKEN)
