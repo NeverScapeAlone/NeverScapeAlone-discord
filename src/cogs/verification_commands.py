@@ -67,51 +67,90 @@ class verificationCommands(Cog):
 
     async def __bad_rsn(self, ctx, login):
         response = "The RSN that you have entered is invalid. It does not match the regex pattern: [\w\d\s_-]{1,12}. Please make a new ticket to re-enter your RSN."
-        return response
+        embed = discord.Embed(title="Bad Rsn")
+        embed = embed.add_field(name="Status", value=response)
+        return embed
 
     async def __bad_discord(self, ctx, login):
         response = f"Your discord pattern is invalid. Support will be contacted, as they will need to check your logs. <@178965680266149888>"
-        return response
+        embed = discord.Embed(title="Bad Discord")
+        embed = embed.add_field(name="Status", value=response)
+        return embed
 
     async def __bad_token(self, ctx, login):
         response = f"The token provided is invalid. This should not happen, unless you are running a bootleg version of the discord bot, or the server owners have not provided the correct key. <@178965680266149888>"
-        return response
+        embed = discord.Embed(title="Bad Token")
+        embed = embed.add_field(name="Status", value=response)
+        return embed
 
     async def __no_information(self, ctx, login):
-        response = (
-            f"We do not have information regarding this account. Follow these steps!\n"
-            + f"1. Log out and close RuneLite.\n"
-            + f"2. Turn ON your discord desktop app, so that discord is running on your PC.\n"
-            + f"3. Relaunch RuneLite.\n"
-            + f"4. Go to the `Search` bar, type in `*` and press `Enter` on your keyboard.\n"
-            + f"5. Even if no matches were found, your discord ID should have been sent to the server during this process.\n"
-            + f"6. Close this ticket.\n"
-            + f"7. Create a new Verify Account ticket.\n"
-            + f"8. Enter your RSN EXACTLY as displayed in-game. This includes underscores where needed, spaces where needed, and capitalizations.\n"
-            + f"Note: If you continue to have issues verifying your account, double check that you've entered in your data correctly, try again, then contact support.\n"
-            + f"\n"
-            + f"If the issue still has not resolved. Please send your `client.log` file in the ticket. You can find this file by going to `.runelite > logs > client.log`."
+        embed = discord.Embed(title="No Information")
+        embed = embed.add_field(
+            name="Status",
+            value="We do not have information regarding this account. Follow these steps!",
+            inline=False,
         )
-        return response
+        embed = embed.add_field(name="Step 1", value="Log out and close RuneLite.")
+        embed = embed.add_field(
+            name="Step 2",
+            value="Turn ON your discord desktop app, so that discord is running on your PC.",
+            inline=False,
+        )
+        embed = embed.add_field(name="Step 3", value="Relaunch RuneLite.")
+        embed = embed.add_field(
+            name="Step 4",
+            value="Go to the `Search` bar, type in `*` and press `Enter` on your keyboard.",
+            inline=False,
+        )
+        embed = embed.add_field(
+            name="Step 5",
+            value="Even if no matches were found, your discord ID should have been sent to the server during this process.",
+            inline=False,
+        )
+        embed = embed.add_field(
+            name="Step 6",
+            value="Enter your RSN EXACTLY as displayed in-game. This includes underscores where needed, spaces where needed, and capitalizations.",
+            inline=False,
+        )
+        embed = embed.add_field(
+            name="Note",
+            value="If you continue to have issues verifying your account, double check that you've entered in your data correctly, try again, then contact support.",
+            inline=False,
+        )
+        embed = embed.add_field(
+            name="Other",
+            value="If the issue still has not resolved. Please send your `client.log` file in the ticket. You can find this file by going to `.runelite > logs > client.log`.",
+            inline=False,
+        )
+        return embed
 
     async def __contact_support(self, ctx, login):
         response = f"Unfortunately, something went wrong on our end. Support has been alerted. <@178965680266149888>"
-        return response
+        embed = discord.Embed(title="Contact Support")
+        embed = embed.add_field(name="Status", value=response)
+        return embed
 
     async def __already_verified(self, ctx, login):
         response = f"Your account has already been verified for {ctx.author} and {login}. If you believe this to be in error, please contact support. Thank you!"
+        embed = discord.Embed(title="Already Verified!")
+        embed = embed.add_field(name="Status", value=response)
+
         role = ctx.guild.get_role(config.VERIFIED_ROLE)
         await ctx.author.add_roles(role)
-        return response
+        return embed
 
     async def __verified(self, ctx, login):
+
         response = (
             f"🎉  Your account has been verified! 🎉 \n"
             + "We hope that you enjoy the plugin. If you have any questions or concerns, please notify support. You are free to close the ticket."
         )
+        embed = discord.Embed(title="🎉Verified!🎉")
+        embed = embed.add_field(name="Status", value=response)
+
         role = ctx.guild.get_role(config.VERIFIED_ROLE)
         await ctx.author.add_roles(role)
-        return response
+        return embed
 
     @commands.command(name="verify")
     async def verify(self, ctx: Context, *login: str):
@@ -129,5 +168,5 @@ class verificationCommands(Cog):
             await ctx.reply(f"{login} is not a valid RSN type.")
             return
 
-        response = await self.__verification_parser(ctx=ctx, login=login)
-        await ctx.reply(response)
+        embed = await self.__verification_parser(ctx=ctx, login=login)
+        await ctx.reply(embed=embed)
