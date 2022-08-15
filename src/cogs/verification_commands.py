@@ -114,12 +114,13 @@ class verificationCommands(Cog):
         return response
 
     @commands.command(name="verify")
-    async def verify(self, ctx: Context, login: str = None):
+    async def verify(self, ctx: Context, *login: str):
         if ctx.channel.id != config.VERIFY_CHANNEL:
             await ctx.reply(
                 f"This is the wrong channel for this command. Please click <#{config.VERIFY_CHANNEL}>"
             )
             return
+        login = " ".join(list(login))
         if not login:
             await ctx.reply(f"You must enter in an RSN.")
             return

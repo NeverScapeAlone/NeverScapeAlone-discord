@@ -2,10 +2,11 @@
 
 import logging
 import random
-import subprocess
 
+import re
 import discord
 from discord.ext import commands
+from src.functions import get_url, post_url, check_match_id
 from discord.ext.commands import Context, Cog
 import src.config as config
 
@@ -33,6 +34,12 @@ class utilCommands(Cog):
                 return None
             return await response.json()
 
+    async def __validate_rsn(self, login: str) -> bool:
+        login = login.strip()
+        if re.fullmatch("[\w\d\s_-]{1,12}", login):
+            return login
+        return None
+
     @commands.command(name="poke")
     async def poke(self, ctx: Context):
         debug = {
@@ -54,6 +61,23 @@ class utilCommands(Cog):
         )
         await ctx.reply(embed=embed)
         pass
+
+    @commands.command(name="whois")
+    async def whois(self, ctx: Context, *login: str):
+        login = " ".join(list(login))
+        if not login:
+            await ctx.reply("You must enter an RSN.")
+        login = await self.__validate_rsn(login)
+        if not login:
+            await ctx.reply(f"{login} is not a valid RSN type.")
+            return
+
+        route = (
+            config.BASE
+            + f"V1/discord/whois?token={config.DISCORD_ROUTE_TOKEN}&login={login}"
+        )
+        response = await get_url(route=route)
+        await ctx.reply(response)
 
     @commands.command(name="meow")
     async def meow(self, ctx: Context):
