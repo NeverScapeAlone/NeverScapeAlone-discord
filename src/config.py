@@ -17,8 +17,8 @@ MATCH_CATEGORY = 993321356005486592
 ACTIVE_QUEUES_CHANNEL = 996565302202605619
 VERIFIED_ROLE = 992927728779153409
 COMMAND_PREFIX = "!"
-BASE = "http://127.0.0.1:8000/"
-# BASE = "http://touchgrass.online:5500/"
+# BASE = "http://127.0.0.1:8000/"
+BASE = "http://touchgrass.online:5500/"
 
 # setup logging
 file_handler = logging.FileHandler(filename="logs/error.log", mode="a")
