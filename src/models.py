@@ -99,14 +99,6 @@ class requirement(BaseModel):
     regions: str
 
 
-class active_match_discord(BaseModel):
-    """active match model"""
-
-    discord_invite: Optional[str]
-    player_count: Optional[int]
-    ID: str
-
-
 class match(BaseModel):
     """match model"""
 
