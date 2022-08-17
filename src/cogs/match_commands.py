@@ -51,7 +51,7 @@ class matchCommands(Cog):
             + f"V1/discord/get-match-information?token={config.DISCORD_ROUTE_TOKEN}&match_id={match_id}"
         )
         response = await get_url(route=route)
-        if response == "This match does not exist":
+        if response == "This match does not exist.":
             await ctx.reply(response)
 
         response = json.dumps(response)

@@ -14,6 +14,7 @@ class search_match_info(BaseModel):
     regions: str
     player_count: str
     party_leader: str
+    match_version: str
     notes: Optional[str]
 
 
@@ -115,6 +116,7 @@ class match(BaseModel):
     party_members: str
     group_passcode: str
     isPrivate: bool
+    match_version: str
     notes: Optional[str]
     ban_list: Optional[list[int]]
     requirement: requirement

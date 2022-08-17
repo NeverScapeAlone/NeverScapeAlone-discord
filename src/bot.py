@@ -43,8 +43,8 @@ async def on_ready():
     await bot.add_cog(utilCommands(bot))
     await bot.add_cog(verificationCommands(bot))
     await bot.add_cog(matchCommands(bot))
-    run_queues.start()
-    manage_channels.start()
+    # run_queues.start()
+    # manage_channels.start()
 
 
 @bot.event
