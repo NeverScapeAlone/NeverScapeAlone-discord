@@ -91,14 +91,16 @@ class utilCommands(Cog):
             + "- Open the screenshot directory by right-clicking 📷 `Camera button`, navigate 1 directory up, then open `logs` folder.\n"
             + "- Navigate to `%userprofile%\.runelite\logs` on **Windows** or `$HOME/.runelite/logs` on **Linux** and **macOS**.\n"
         )
-        embed = discord.Embed(title="Submitting your `client.log` file.")
+        embed = discord.Embed(
+            color=15844367, title="Submitting your `client.log` file."
+        )
         embed = embed.add_field(name="Finding your client.log file", value=response)
         await ctx.reply(embed=embed)
 
     @commands.command(name="report")
     async def report(self, ctx: Context):
         """Report another player, or an issue with your match."""
-        embed = discord.Embed(title="Report another Player")
+        embed = discord.Embed(color=10038562, title="Report another Player")
         embed.add_field(
             name="Submitting via Discord",
             value="To report another player, please visit our support channel <#992457386189144074> and `Submit A Concern`.",
@@ -119,7 +121,7 @@ class utilCommands(Cog):
     @commands.command(name="bug")
     async def bug(self, ctx: Context):
         """Report a bug, or an issue with your plugin."""
-        embed = discord.Embed(title="Bug Report")
+        embed = discord.Embed(color=10181046, title="Bug Report")
         embed.add_field(
             name="Submitting via Discord",
             value="To submit a bug, please visit our support channel <#992457386189144074> and click `Submit Bug Report`.",
