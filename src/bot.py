@@ -9,6 +9,7 @@ from discord.app_commands import checks, commands, tree
 from discord.ext import tasks
 from discord.ext.commands import Bot
 from pydantic import BaseModel
+import traceback
 
 import src.models as models
 from src import config
@@ -43,19 +44,15 @@ async def on_ready():
     await bot.add_cog(utilCommands(bot))
     await bot.add_cog(verificationCommands(bot))
     await bot.add_cog(matchCommands(bot))
+
+    channel = bot.get_channel(config.DISCORD_ALERT_CHANNEL)
+    current_time = int(time.time())
+    embed = discord.Embed(
+        colour=1752220, title=f"Started <t:{current_time}:R> on <t:{current_time}:F>"
+    )
+    await channel.send(embed=embed)
     run_queues.start()
     manage_channels.start()
-
-
-@bot.event
-async def on_connect():
-    logger.info("Bot connected successfully.")
-    logger.info(f"{config.COMMAND_PREFIX=}")
-
-
-@bot.event
-async def on_disconnect():
-    logger.info("Bot disconnected.")
 
 
 @tasks.loop(seconds=20)

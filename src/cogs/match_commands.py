@@ -30,6 +30,10 @@ class matchCommands(Cog):
     @commands.command(name="delete")
     @checks.has_role(config.MATCH_MODERATOR)
     async def delete(self, ctx: Context, match_id: str = None):
+        if not match_id:
+            await ctx.reply("Please enter a Match ID")
+            return
+
         if not await check_match_id(match_id=match_id):
             await ctx.reply("Invalid Match ID format")
             return
@@ -43,6 +47,10 @@ class matchCommands(Cog):
 
     @commands.command(name="info")
     async def info(self, ctx: Context, match_id: str = None):
+        if not match_id:
+            await ctx.reply("Please enter a Match ID")
+            return
+
         if not await check_match_id(match_id=match_id):
             await ctx.reply("Invalid Match ID format")
             return

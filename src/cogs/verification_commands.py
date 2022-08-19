@@ -1,8 +1,6 @@
 # modified from extreme4all's bot detector discord bot
 
 import logging
-import random
-import subprocess
 import re
 from types import NoneType
 
@@ -67,24 +65,24 @@ class verificationCommands(Cog):
 
     async def __bad_rsn(self, ctx, login):
         response = "The RSN that you have entered is invalid. It does not match the regex pattern: [\w\d\s_-]{1,12}. Please make a new ticket to re-enter your RSN."
-        embed = discord.Embed(title="Bad Rsn")
+        embed = discord.Embed(colour=16776960, title="Bad Rsn")
         embed = embed.add_field(name="Status", value=response)
         return embed
 
     async def __bad_discord(self, ctx, login):
         response = f"Your discord pattern is invalid. Support will be contacted, as they will need to check your logs. <@178965680266149888>"
-        embed = discord.Embed(title="Bad Discord")
+        embed = discord.Embed(colour=15158332, title="Bad Discord")
         embed = embed.add_field(name="Status", value=response)
         return embed
 
     async def __bad_token(self, ctx, login):
         response = f"The token provided is invalid. This should not happen, unless you are running a bootleg version of the discord bot, or the server owners have not provided the correct key. <@178965680266149888>"
-        embed = discord.Embed(title="Bad Token")
+        embed = discord.Embed(colour=15158332, title="Bad Token")
         embed = embed.add_field(name="Status", value=response)
         return embed
 
     async def __no_information(self, ctx, login):
-        embed = discord.Embed(title="No Information")
+        embed = discord.Embed(colour=16776960, title="No Information")
         embed = embed.add_field(
             name="Status",
             value="We do not have information regarding this account. Follow these steps!",
@@ -126,13 +124,13 @@ class verificationCommands(Cog):
 
     async def __contact_support(self, ctx, login):
         response = f"Unfortunately, something went wrong on our end. Support has been alerted. <@178965680266149888>"
-        embed = discord.Embed(title="Contact Support")
+        embed = discord.Embed(colour=15158332, title="Contact Support")
         embed = embed.add_field(name="Status", value=response)
         return embed
 
     async def __already_verified(self, ctx, login):
         response = f"Your account has already been verified for {ctx.author} and {login}. If you believe this to be in error, please contact support. Thank you!"
-        embed = discord.Embed(title="Already Verified!")
+        embed = discord.Embed(colour=3066993, title="Already Verified!")
         embed = embed.add_field(name="Status", value=response)
 
         role = ctx.guild.get_role(config.VERIFIED_ROLE)
@@ -145,7 +143,7 @@ class verificationCommands(Cog):
             f"🎉  Your account has been verified! 🎉 \n"
             + "We hope that you enjoy the plugin. If you have any questions or concerns, please notify support. You are free to close the ticket."
         )
-        embed = discord.Embed(title="🎉Verified!🎉")
+        embed = discord.Embed(colour=3066993, title="🎉Verified!🎉")
         embed = embed.add_field(name="Status", value=response)
 
         role = ctx.guild.get_role(config.VERIFIED_ROLE)
