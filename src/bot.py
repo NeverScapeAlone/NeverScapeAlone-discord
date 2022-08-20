@@ -17,6 +17,7 @@ from src.functions import get_url, post_url, check_match_id
 from src.cogs.util_commands import utilCommands
 from src.cogs.verification_commands import verificationCommands
 from src.cogs.match_commands import matchCommands
+from src.cogs.management_commands import managementCommands
 
 logger = logging.getLogger(__name__)
 
@@ -44,6 +45,7 @@ async def on_ready():
     await bot.add_cog(utilCommands(bot))
     await bot.add_cog(verificationCommands(bot))
     await bot.add_cog(matchCommands(bot))
+    await bot.add_cog(managementCommands(bot))
 
     channel = bot.get_channel(config.DISCORD_ALERT_CHANNEL)
     current_time = int(time.time())
