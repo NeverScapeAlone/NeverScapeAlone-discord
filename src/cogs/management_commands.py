@@ -2,10 +2,6 @@
 
 import json
 import logging
-import random
-import re
-import subprocess
-import time
 from types import NoneType
 
 import discord
@@ -27,6 +23,10 @@ class managementCommands(Cog):
         """
         self.bot = bot
 
+    def __convert_url(self, url):
+        url = url.replace("api.", "").replace("repos/", "")
+        return url
+
     @commands.command(name="update")
     @checks.has_role(config.OWNER_ROLE)
     async def delete(self, ctx: Context):
@@ -41,4 +41,31 @@ class managementCommands(Cog):
             title="API Update",
             description=response["detail"],
         )
+        await ctx.reply(embed=embed)
+
+    @commands.command(name="top10")
+    @checks.has_role(config.OWNER_ROLE)
+    async def delete(self, ctx: Context):
+        route = config.BASE + f"V1/discord/get-tasks?token={config.DISCORD_ROUTE_TOKEN}"
+        response = await get_url(route=route)
+        response = json.dumps(response)
+        response = json.loads(response)
+
+        issue_list = response["issues"]
+        embed = discord.Embed(
+            color=2067276,
+            title="Top 10 Issues Sorted by Development Priority",
+        )
+
+        for c, issue in enumerate(issue_list):
+            title = issue["title"]
+            url = self.__convert_url(url=issue["url"])
+            priority = issue["priority"]
+            embed = embed.add_field(
+                name=f"#{c+1} § ({priority})",
+                value=f"[{title}]({url})",
+                inline=False,
+            )
+            if c == 9:
+                break
         await ctx.reply(embed=embed)
