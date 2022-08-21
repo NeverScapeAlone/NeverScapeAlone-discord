@@ -29,7 +29,7 @@ class managementCommands(Cog):
 
     @commands.command(name="update")
     @checks.has_role(config.OWNER_ROLE)
-    async def delete(self, ctx: Context):
+    async def update(self, ctx: Context):
         route = (
             config.BASE + f"V1/discord/update-api?token={config.DISCORD_ROUTE_TOKEN}"
         )
@@ -45,7 +45,7 @@ class managementCommands(Cog):
 
     @commands.command(name="top10")
     @checks.has_role(config.OWNER_ROLE)
-    async def delete(self, ctx: Context):
+    async def top10(self, ctx: Context):
         route = config.BASE + f"V1/discord/get-tasks?token={config.DISCORD_ROUTE_TOKEN}"
         response = await get_url(route=route)
         response = json.dumps(response)
