@@ -28,7 +28,7 @@ class managementCommands(Cog):
         return url
 
     @commands.command(name="update")
-    @checks.has_role(config.OWNER_ROLE)
+    @commands.has_role(config.OWNER_ROLE)
     async def update(self, ctx: Context):
         route = (
             config.BASE + f"V1/discord/update-api?token={config.DISCORD_ROUTE_TOKEN}"
@@ -44,7 +44,7 @@ class managementCommands(Cog):
         await ctx.reply(embed=embed)
 
     @commands.command(name="top10")
-    @checks.has_role(config.OWNER_ROLE)
+    @commands.has_role(config.OWNER_ROLE)
     async def top10(self, ctx: Context):
         route = config.BASE + f"V1/discord/get-tasks?token={config.DISCORD_ROUTE_TOKEN}"
         response = await get_url(route=route)
