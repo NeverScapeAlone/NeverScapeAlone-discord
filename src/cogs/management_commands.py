@@ -40,7 +40,7 @@ class managementCommands(Cog):
         repl = "\\x" + hex(ord(thebyte))[2:]
         return (repl, err.end)
 
-    def __parse_file(self, stream):
+    def __parse_file(self, stream, verbose=False):
         codecs.register_error("slashescape", self.__slashescape)
 
         # --- processing
@@ -52,7 +52,7 @@ class managementCommands(Cog):
         file = lines[0]
         file = file.replace("\n", "")
         file = file.replace("\r", "")
-        file = file.replace("\tat", "")
+        file = file.replace("\t", "")
         file = re.sub(
             "[0-9]{4}-[0-9]{2}-[0-9]{2}[ ]{1}[0-9]{2}:[0-9]{2}:[0-9]{2}",
             "§SEPERATOR§",
@@ -64,16 +64,24 @@ class managementCommands(Cog):
         version = ""
         for line in lines:
             l = line.lower()
-            if l.find("neverscapealone") != -1:
-                if l.find("version") != -1:
-                    version = (
-                        line[
-                            line.find("version") + len("version") : line.find("commit")
-                        ]
-                        .replace('"', "")
-                        .strip()
-                    )
-                parsed.append(line.strip())
+            if l.find("neverscapealone") == -1:
+                continue
+            if l.find("version") != -1:
+                version = (
+                    line[line.find("version") + len("version") : line.find("commit")]
+                    .replace('"', "")
+                    .strip()
+                )
+
+            short = line[line.find("]") + len("]") :].strip()
+            title = short[: short.find("-")].strip()
+            description = short[short.find("-") + 1 :].strip()
+            if not verbose:
+                if title.find("NeverScapeAlonePlugin") != -1:
+                    continue
+                if title.find("ExternalPluginManager") != -1:
+                    continue
+            parsed.append((title, description))
         return version, parsed
 
     @commands.command(name="update")
@@ -121,14 +129,15 @@ class managementCommands(Cog):
 
     @commands.command(name="parse")
     @commands.has_any_role(config.MATCH_MODERATOR, config.OWNER_ROLE, config.STAFF)
-    async def parse(self, ctx: Context):
+    async def parse(self, ctx: Context, verbose=False):
         """quickly parses a client.log file"""
         # determine if the current !parse command is self, or in relation to a reply.
         attachments = []
-        if ctx.message.reference.message_id:
-            # check if interaction has the attachment
-            message = await ctx.fetch_message(ctx.message.reference.message_id)
-            attachments = message.attachments
+        if ctx.message.reference:
+            if ctx.message.reference.message_id:
+                # check if interaction has the attachment
+                message = await ctx.fetch_message(ctx.message.reference.message_id)
+                attachments = message.attachments
         if ctx.message.attachments:
             # check if current has the attachment, prioritize this and override check
             attachments = ctx.message.attachments
@@ -139,19 +148,33 @@ class managementCommands(Cog):
             await ctx.reply(embed=embed)
             return
         for attachment in attachments:
-            if attachment.filename != "client.log":
+            if attachment.filename.find("client") == -1:
                 continue
             await ctx.typing()
             await ctx.reply(f"Processing {attachment.filename} file...")
             content = await attachment.read()
             if content:
                 break
+            else:
+                embed = discord.Embed(title=f"Empty {attachment.filename}")
+                await ctx.reply(embed=embed)
+                return
 
         await ctx.typing()
-        version, parsed = self.__parse_file(stream=content)
+        version, parsed = self.__parse_file(stream=content, verbose=verbose)
         embed = discord.Embed(
-            title=f"client.log Parsed", description=f"Plugin Version {version}"
+            title=f"Parsed {attachment.filename}",
+            description=f"Plugin Version {version}",
         )
-        for c, line in enumerate(parsed[2:]):
-            embed.add_field(name=f"Line {c+1}", value=line, inline=False)
+
+        if not parsed:
+            embed.add_field(
+                name=f"No Errors",
+                value="There were no errors found for NeverScapeAlone.",
+                inline=False,
+            )
+            await ctx.reply(embed=embed)
+            return
+        for title, description in parsed:
+            embed.add_field(name=title, value=description, inline=False)
         await ctx.reply(embed=embed)
