@@ -28,7 +28,7 @@ class matchCommands(Cog):
         self.bot = bot
 
     @commands.command(name="delete")
-    @checks.has_role(config.MATCH_MODERATOR)
+    @commands.has_role(config.OWNER_ROLE)
     async def delete(self, ctx: Context, match_id: str = None):
         if not match_id:
             await ctx.reply("Please enter a Match ID")
