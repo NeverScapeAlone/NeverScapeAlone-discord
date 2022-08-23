@@ -111,7 +111,7 @@ class managementCommands(Cog):
         issue_list = response["issues"]
         embed = discord.Embed(
             color=2067276,
-            title="Top 10 Issues Sorted by Development Priority",
+            title="🎊 __Top 10 Issues Sorted by Development Priority__ 🎊",
         )
 
         for c, issue in enumerate(issue_list):
@@ -163,8 +163,8 @@ class managementCommands(Cog):
         await ctx.typing()
         version, parsed = self.__parse_file(stream=content, verbose=verbose)
         embed = discord.Embed(
-            title=f"Parsed {attachment.filename}",
-            description=f"Plugin Version {version}",
+            title=f"📝 Parsed {attachment.filename} 📝",
+            description=f"💽 Plugin Version {version} 💽",
         )
 
         if not parsed:
@@ -177,4 +177,14 @@ class managementCommands(Cog):
             return
         for title, description in parsed:
             embed.add_field(name=title, value=description, inline=False)
-        await ctx.reply(embed=embed)
+        try:
+            await ctx.reply(embed=embed)
+        except discord.errors.HTTPException:
+            embed = discord.Embed(
+                title=f"📝 Unparsed {attachment.filename} 📝",
+                description=f"💽 Plugin Version {version} 💽",
+            )
+            embed.add_field(
+                name="File could not be parsed.", value="Errors exceed 6000 characters."
+            )
+            await ctx.reply(embed=embed)

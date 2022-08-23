@@ -64,73 +64,75 @@ class verificationCommands(Cog):
         return await response_parser[response](ctx=ctx, login=login)
 
     async def __bad_rsn(self, ctx, login):
-        response = "The RSN that you have entered is invalid. It does not match the regex pattern: [\w\d\s_-]{1,12}. Please make a new ticket to re-enter your RSN."
-        embed = discord.Embed(colour=16776960, title="Bad Rsn")
+        response = "The RSN that you have entered is invalid. It does not match the regex pattern: [\w\d\s_-]{1,12}. Please re-enter your RSN."
+        embed = discord.Embed(colour=16776960, title="❌Bad Rsn❌")
         embed = embed.add_field(name="Status", value=response)
         return embed
 
     async def __bad_discord(self, ctx, login):
-        response = f"Your discord pattern is invalid. Support will be contacted, as they will need to check your logs. <@178965680266149888>"
-        embed = discord.Embed(colour=15158332, title="Bad Discord")
+        response = (
+            f"Your discord pattern is invalid. Please visit <#992457386189144074>."
+        )
+        embed = discord.Embed(colour=15158332, title="❌Bad Discord❌")
         embed = embed.add_field(name="Status", value=response)
         return embed
 
     async def __bad_token(self, ctx, login):
         response = f"The token provided is invalid. This should not happen, unless you are running a bootleg version of the discord bot, or the server owners have not provided the correct key. <@178965680266149888>"
-        embed = discord.Embed(colour=15158332, title="Bad Token")
+        embed = discord.Embed(colour=15158332, title="❌Bad Token❌")
         embed = embed.add_field(name="Status", value=response)
         return embed
 
     async def __no_information(self, ctx, login):
-        embed = discord.Embed(colour=16776960, title="No Information")
+        embed = discord.Embed(colour=16776960, title="❓No Information❓")
         embed = embed.add_field(
             name="Status",
             value="We do not have information regarding this account. Follow these steps!",
             inline=False,
         )
-        embed = embed.add_field(name="Step 1", value="Log out and close RuneLite.")
+        embed = embed.add_field(name="➡️ Step 1", value="Log out and close RuneLite.")
         embed = embed.add_field(
-            name="Step 2",
+            name="➡️ Step 2",
             value="Turn ON your discord desktop app, so that discord is running on your PC.",
             inline=False,
         )
-        embed = embed.add_field(name="Step 3", value="Relaunch RuneLite.")
+        embed = embed.add_field(name="➡️ Step 3", value="Relaunch RuneLite.")
         embed = embed.add_field(
-            name="Step 4",
+            name="➡️ Step 4",
             value="Go to the `Search` bar, type in `*` and press `Enter` on your keyboard.",
             inline=False,
         )
         embed = embed.add_field(
-            name="Step 5",
+            name="➡️ Step 5",
             value="Even if no matches were found, your discord ID should have been sent to the server during this process.",
             inline=False,
         )
         embed = embed.add_field(
-            name="Step 6",
+            name="➡️ Step 6",
             value="Enter your RSN EXACTLY as displayed in-game. This includes underscores where needed, spaces where needed, and capitalizations.",
             inline=False,
         )
         embed = embed.add_field(
-            name="Note",
+            name="❗ Note",
             value="If you continue to have issues verifying your account, double check that you've entered in your data correctly, try again, then contact support.",
             inline=False,
         )
         embed = embed.add_field(
-            name="Other",
+            name="❕ Other",
             value="If the issue still has not resolved. Please send your `client.log` file in the ticket. You can find this file by going to `.runelite > logs > client.log`.",
             inline=False,
         )
         return embed
 
     async def __contact_support(self, ctx, login):
-        response = f"Unfortunately, something went wrong on our end. Support has been alerted. <@178965680266149888>"
-        embed = discord.Embed(colour=15158332, title="Contact Support")
+        response = f"Unfortunately, something went wrong on our end. Please visit <#992457386189144074>"
+        embed = discord.Embed(colour=15158332, title="💻Contact Support💻")
         embed = embed.add_field(name="Status", value=response)
         return embed
 
     async def __already_verified(self, ctx, login):
-        response = f"Your account has already been verified for {ctx.author} and {login}. If you believe this to be in error, please contact support. Thank you!"
-        embed = discord.Embed(colour=3066993, title="Already Verified!")
+        response = f"Your account has already been verified for {ctx.author} and {login}. If you believe this to be in error, please contact support. \n Be sure to visit <#1011433062883659797>!"
+        embed = discord.Embed(colour=3066993, title="🎉Already Verified!🎉")
         embed = embed.add_field(name="Status", value=response)
 
         role = ctx.guild.get_role(config.VERIFIED_ROLE)
@@ -141,7 +143,8 @@ class verificationCommands(Cog):
 
         response = (
             f"🎉  Your account has been verified! 🎉 \n"
-            + "We hope that you enjoy the plugin. If you have any questions or concerns, please notify support. You are free to close the ticket."
+            + "We hope that you enjoy the plugin. If you have any questions or concerns, please notify support. \n"
+            + "Be sure to visit <#1011433062883659797>!"
         )
         embed = discord.Embed(colour=3066993, title="🎉Verified!🎉")
         embed = embed.add_field(name="Status", value=response)
@@ -154,7 +157,8 @@ class verificationCommands(Cog):
     async def verify(self, ctx: Context, *login: str):
         if ctx.channel.id != config.VERIFY_CHANNEL:
             await ctx.reply(
-                f"This is the wrong channel for this command. Please click <#{config.VERIFY_CHANNEL}>"
+                f"❌ This is the wrong channel for this command. ❌\n"
+                + f"Please click <#{config.VERIFY_CHANNEL}>"
             )
             return
         login = " ".join(list(login))

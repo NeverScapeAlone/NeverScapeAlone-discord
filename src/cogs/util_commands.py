@@ -52,15 +52,11 @@ class utilCommands(Cog):
         logger.debug(debug)
         url = config.BASE
         ping = await self.__web_request(url)
-        isServerUp = "Online" if ping is not None else "Uh-Oh"
+        isServerUp = "🟢 Online" if ping is not None else "🔴 Offline"
 
         embed = discord.Embed(color=0x00FF)
-        embed.add_field(
-            name="Discord Ping:", value=f"{self.bot.latency:.3f} ms", inline=False
-        )
-        embed.add_field(
-            name="NeverScapeAlone API status:", value=f"{isServerUp}", inline=False
-        )
+        embed.add_field(name="Ping", value=f"{self.bot.latency:.3f} ms", inline=False)
+        embed.add_field(name="Status", value=f"{isServerUp}", inline=False)
         await ctx.reply(embed=embed)
         pass
 
@@ -92,7 +88,7 @@ class utilCommands(Cog):
             + "- Navigate to `%userprofile%\.runelite\logs` on **Windows** or `$HOME/.runelite/logs` on **Linux** and **macOS**.\n"
         )
         embed = discord.Embed(
-            color=15844367, title="Submitting your `client.log` file."
+            color=15844367, title="📝 Submitting your `client.log` file. 📝"
         )
         embed = embed.add_field(name="Finding your client.log file", value=response)
         await ctx.reply(embed=embed)
@@ -102,17 +98,17 @@ class utilCommands(Cog):
         """Report another player, or an issue with your match."""
         embed = discord.Embed(color=10038562, title="Report another Player")
         embed.add_field(
-            name="Submitting via Discord",
+            name="➡️ Submitting via Discord",
             value="To report another player, please visit our support channel <#992457386189144074> and `Submit A Concern`.",
             inline=False,
         )
         embed.add_field(
-            name="Jagex Rule Broken",
+            name="➡️ Jagex Rule Broken",
             value="If an in-game rule has been broken, please report these players in-game.",
             inline=False,
         )
         embed.add_field(
-            name="Scamming/Theft of Items",
+            name="➡️ Scamming/Theft of Items",
             value="In addition to reporting a player in-game, please submit a runewatch case here: https://runewatch.com/",
             inline=False,
         )
@@ -123,12 +119,12 @@ class utilCommands(Cog):
         """Report a bug, or an issue with your plugin."""
         embed = discord.Embed(color=10181046, title="Bug Report")
         embed.add_field(
-            name="Submitting via Discord",
+            name="➡️ Submitting via Discord",
             value="To submit a bug, please visit our support channel <#992457386189144074> and click `Submit Bug Report`.",
             inline=False,
         )
         embed.add_field(
-            name="Submitting via Github",
+            name="➡️ Submitting via Github",
             value="You can also go to our github and submit an issue: https://github.com/NeverScapeAlone/never-scape-alone/issues",
             inline=False,
         )
