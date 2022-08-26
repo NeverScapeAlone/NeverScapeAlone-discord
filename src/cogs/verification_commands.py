@@ -99,7 +99,7 @@ class verificationCommands(Cog):
         embed = embed.add_field(name="➡️ Step 3", value="Relaunch RuneLite.")
         embed = embed.add_field(
             name="➡️ Step 4",
-            value="Go to the `Search` bar, type in `*` and press `Enter` on your keyboard.",
+            value="Go to the `Search` bar in the `NeverScapeAlone` plugin, type in `*` and press `Enter` on your keyboard.",
             inline=False,
         )
         embed = embed.add_field(
