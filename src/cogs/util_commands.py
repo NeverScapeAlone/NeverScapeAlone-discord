@@ -93,6 +93,17 @@ class utilCommands(Cog):
         embed = embed.add_field(name="Finding your client.log file", value=response)
         await ctx.reply(embed=embed)
 
+    @commands.command(name="ip")
+    async def ip(self, ctx: Context):
+        embed = discord.Embed(
+            color=10181046, title="🤔 Why does the plugin need your IP address? 🤔"
+        )
+        embed = embed.add_field(
+            name="Click here to find out!",
+            value=f"[All your mysteries will be revealed...](https://letmegooglethat.com/?q=What+is+the+purpose+of+an+IP+address%3F)",
+        )
+        await ctx.reply(embed=embed)
+
     @commands.command(name="report")
     async def report(self, ctx: Context):
         """Report another player, or an issue with your match."""
