@@ -175,16 +175,32 @@ class managementCommands(Cog):
             )
             await ctx.reply(embed=embed)
             return
+
         for title, description in parsed:
             embed.add_field(name=title, value=description, inline=False)
         try:
             await ctx.reply(embed=embed)
         except discord.errors.HTTPException:
-            embed = discord.Embed(
-                title=f"📝 Unparsed {attachment.filename} 📝",
-                description=f"💽 Plugin Version {version} 💽",
-            )
-            embed.add_field(
-                name="File could not be parsed.", value="Errors exceed 6000 characters."
-            )
-            await ctx.reply(embed=embed)
+            try:
+                embed = discord.Embed(
+                    title=f"📝 Parsed {attachment.filename} 📝",
+                    description=f"💽 Plugin Version {version} 💽",
+                )
+
+                titles = []
+                for title, description in parsed:
+                    titles.append(title)
+                titles = list(set(titles))
+                for title in titles:
+                    embed.add_field(name=title, value="\u200b", inline=False)
+                await ctx.reply(embed=embed)
+            except discord.errors.HTTPException:
+                embed = discord.Embed(
+                    title=f"📝 Unparsed {attachment.filename} 📝",
+                    description=f"💽 Plugin Version {version} 💽",
+                )
+                embed.add_field(
+                    name="File could not be parsed.",
+                    value="Errors exceed 6000 characters.",
+                )
+                await ctx.reply(embed=embed)
