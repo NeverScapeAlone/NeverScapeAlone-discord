@@ -78,6 +78,23 @@ class utilCommands(Cog):
         response = await get_url(route=route)
         await ctx.reply(response)
 
+    @commands.command(name="events")
+    async def events(self, ctx: Context):
+        event_role = ctx.guild.get_role(config.EVENTS_ROLE)
+        if not event_role:
+            await ctx.reply(
+                "There was an error, contacting support: <@178965680266149888>"
+            )
+
+        if ctx.author.get_role(config.EVENTS_ROLE):
+            await ctx.author.remove_roles(event_role)
+            await ctx.reply("You have been unsubscribed from events!")
+            return
+        else:
+            await ctx.author.add_roles(event_role)
+            await ctx.reply("You have been subscribed to events!")
+            return
+
     @commands.command(name="logs")
     async def logs(self, ctx: Context):
         """Tips on how to access your client.log file"""
