@@ -87,7 +87,7 @@ class verificationCommands(Cog):
         embed = discord.Embed(colour=16776960, title="❓No Information❓")
         embed = embed.add_field(
             name="Status",
-            value="We do not have information regarding this account. Follow these steps!",
+            value="We do not have information regarding this account. Follow these steps!\n __**MAKE SURE THAT YOU HAVE USED THE PLUGIN AT LEAST ONCE BEFORE VERIFYING!**__",
             inline=False,
         )
         embed = embed.add_field(name="➡️ Step 1", value="Log out and close RuneLite.")
@@ -114,7 +114,7 @@ class verificationCommands(Cog):
         )
         embed = embed.add_field(
             name="❗ Note",
-            value="If you continue to have issues verifying your account, double check that you've entered in your data correctly, try again, then contact support.",
+            value="If you continue to have issues verifying your account, double check that you've entered in your data correctly, **LAUNCH RUNELITE IN ADMINISTRATOR MODE**, try again, then contact support.",
             inline=False,
         )
         embed = embed.add_field(
