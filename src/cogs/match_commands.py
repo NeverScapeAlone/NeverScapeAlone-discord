@@ -48,6 +48,21 @@ class matchCommands(Cog):
         response = await get_url(route=route)
         await ctx.reply(response)
 
+    @commands.command(name="getallmatches")
+    @commands.has_role(config.MATCH_MODERATOR)
+    async def getallmatches(self, ctx: Context, compress=1):
+        """[MATCH MODERATORS] Get all matches"""
+        route = (
+            config.BASE
+            + f"V1/discord/get-all-matches?token={config.DISCORD_ROUTE_TOKEN}"
+        )
+        response = await get_url(route=route)
+        if not compress:
+            output = "\n".join(response)
+        else:
+            output = ", ".join(response)
+        await ctx.reply(output)
+
     @commands.command(name="history")
     @commands.has_role(config.MATCH_MODERATOR)
     async def history(self, ctx: Context, match_id: str = None):
