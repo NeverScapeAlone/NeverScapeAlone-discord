@@ -21,3 +21,9 @@ async def check_match_id(match_id: str) -> bool:
     if re.fullmatch("^[A-Za-z0-9]{4}-[A-Za-z0-9]{4}", match_id):
         return True
     return False
+
+
+class AttrDict(dict):
+    def __init__(self, *args, **kwargs):
+        super(AttrDict, self).__init__(*args, **kwargs)
+        self.__dict__ = self

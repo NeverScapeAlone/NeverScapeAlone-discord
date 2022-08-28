@@ -155,6 +155,7 @@ class verificationCommands(Cog):
 
     @commands.command(name="verify")
     async def verify(self, ctx: Context, *login: str):
+        """verifies your account"""
         if ctx.channel.id != config.VERIFY_CHANNEL:
             await ctx.reply(
                 f"❌ This is the wrong channel for this command. ❌\n"

@@ -80,6 +80,7 @@ class utilCommands(Cog):
 
     @commands.command(name="events")
     async def events(self, ctx: Context):
+        """un/subscribe to the events channel"""
         event_role = ctx.guild.get_role(config.EVENTS_ROLE)
         if not event_role:
             await ctx.reply(
@@ -112,6 +113,7 @@ class utilCommands(Cog):
 
     @commands.command(name="ip")
     async def ip(self, ctx: Context):
+        """A helpful link for why the plugin needs your IP address"""
         embed = discord.Embed(
             color=10181046, title="🤔 Why does the plugin need your IP address? 🤔"
         )
