@@ -7,6 +7,8 @@ import re
 import subprocess
 import time
 from types import NoneType
+import time
+import io
 
 import discord
 import src.config as config
@@ -14,7 +16,7 @@ import src.models as models
 from discord.ext import commands
 from discord.ext.commands import Cog, Context
 from discord.app_commands import checks
-from src.functions import check_match_id, get_url, post_url
+from src.functions import check_match_id, get_url, post_url, AttrDict
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +32,7 @@ class matchCommands(Cog):
     @commands.command(name="delete")
     @commands.has_role(config.MATCH_MODERATOR)
     async def delete(self, ctx: Context, match_id: str = None):
+        """[MATCH MODERATORS] delete a match"""
         if not match_id:
             await ctx.reply("Please enter a Match ID")
             return
@@ -45,8 +48,62 @@ class matchCommands(Cog):
         response = await get_url(route=route)
         await ctx.reply(response)
 
+    @commands.command(name="history")
+    @commands.has_role(config.MATCH_MODERATOR)
+    async def history(self, ctx: Context, match_id: str = None):
+        """[MATCH MODERATORS] get the history of a match"""
+        if not match_id:
+            await ctx.reply("Please enter a Match ID")
+            return
+
+        if not await check_match_id(match_id=match_id):
+            await ctx.reply("Invalid Match ID format")
+            return
+
+        route = (
+            config.BASE
+            + f"V2/match_history?match_identifier={match_id}&access_token={config.DISCORD_ROUTE_TOKEN}"
+        )
+
+        response = await get_url(route=route)
+
+        try:
+            detail = response["detail"]
+            await ctx.reply(detail)
+            return
+        except:
+            pass
+
+        match_history = response["match_history"]
+        lines = []
+        for data in match_history:
+            keys = data.keys()
+            if "afk_cleanup" in keys:
+                out = data["afk_cleanup"]
+                middle = "afk"
+            elif "disconnect" in keys:
+                out = data["disconnect"]
+                middle = "disconnect"
+            elif "successful_join" in keys:
+                out = data["successful_join"]
+                middle = "join"
+            else:
+                out = None
+            if not out:
+                continue
+            t = time.ctime(data["time"])
+            line = f"""[{t}] - {middle} - {out}"""
+            lines.append(line)
+
+        output = "\n".join(lines)
+        buf = io.BytesIO(output.encode())
+        cur_time = time.strftime(f"%Y%m%d%H%M%S")
+        f = discord.File(buf, filename=f"{match_id}-{cur_time}.txt")
+        await ctx.reply(file=f)
+
     @commands.command(name="info")
     async def info(self, ctx: Context, match_id: str = None):
+        """get the current information for a match"""
         if not match_id:
             await ctx.reply("Please enter a Match ID")
             return

@@ -87,6 +87,7 @@ class managementCommands(Cog):
     @commands.command(name="update")
     @commands.has_role(config.OWNER_ROLE)
     async def update(self, ctx: Context):
+        """[OWNER] update the API"""
         route = (
             config.BASE + f"V1/discord/update-api?token={config.DISCORD_ROUTE_TOKEN}"
         )
@@ -103,6 +104,7 @@ class managementCommands(Cog):
     @commands.command(name="top10")
     @commands.has_role(config.OWNER_ROLE)
     async def top10(self, ctx: Context):
+        """[OWNER] Get the top10 issues for development on github"""
         route = config.BASE + f"V1/discord/get-tasks?token={config.DISCORD_ROUTE_TOKEN}"
         response = await get_url(route=route)
         response = json.dumps(response)
@@ -130,7 +132,7 @@ class managementCommands(Cog):
     @commands.command(name="parse")
     @commands.has_any_role(config.MATCH_MODERATOR, config.OWNER_ROLE, config.STAFF)
     async def parse(self, ctx: Context, verbose=False):
-        """quickly parses a client.log file"""
+        """[OWNER, MATCH MODERATOR, STAFF] quickly parses a client.log file"""
         # determine if the current !parse command is self, or in relation to a reply.
         attachments = []
         if ctx.message.reference:
