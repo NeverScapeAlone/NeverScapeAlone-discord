@@ -123,6 +123,16 @@ class utilCommands(Cog):
         )
         await ctx.reply(embed=embed)
 
+    @commands.command(name="newplayer")
+    async def newplayer(self, ctx: Context):
+        """A link for new players"""
+        embed = discord.Embed(color=10181046, title="🆕 New Player 🆕")
+        embed = embed.add_field(
+            name="Wiki Guide",
+            value=f"[New Player Guide](https://oldschool.runescape.wiki/w/New_player_guide)",
+        )
+        await ctx.reply(embed=embed)
+
     @commands.command(name="report")
     async def report(self, ctx: Context):
         """Report another player, or an issue with your match."""
