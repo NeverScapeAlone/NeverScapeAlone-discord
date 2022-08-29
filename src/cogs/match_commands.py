@@ -83,9 +83,19 @@ class matchCommands(Cog):
         active_matches = active_matches["active_matches_discord"]
         active_IDs = [am["ID"] for am in active_matches]
 
-        await ctx.reply(
-            "\n".join([ID for ID in active_IDs if ID not in managed_matches])
+        headless = [ID for ID in active_IDs if ID not in managed_matches]
+        ghost = [ID for ID in managed_matches if ID not in active_IDs if ID != "0"]
+        reply = (
+            "**HEADLESS**"
+            + "\n*These matches can be* `!deleted` *and joined.*"
+            + "\n".join(headless)
+            + "\n"
+            + "\n**GHOST**"
+            + "\n*These matches have no data, and require an API restart to clear*"
+            + "\n"
+            + "\n".join(ghost)
         )
+        await ctx.reply(reply)
 
     @commands.command(name="history")
     @commands.has_role(config.MATCH_MODERATOR)
