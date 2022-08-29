@@ -99,6 +99,7 @@ class managementCommands(Cog):
             title="API Update",
             description=response["detail"],
         )
+
         await ctx.reply(embed=embed)
 
     @commands.command(name="top10")

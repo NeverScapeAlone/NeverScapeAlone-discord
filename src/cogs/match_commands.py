@@ -29,6 +29,15 @@ class matchCommands(Cog):
         """
         self.bot = bot
 
+    async def __log_command(self, author_login, command, group_id=None):
+        channel = self.bot.get_channel(config.MODERATOR_LOGS)
+        current_time = int(time.time())
+        embed = discord.Embed(
+            colour=1752220,
+            title=f"{author_login} ran {command} {group_id} <t:{current_time}:R>",
+        )
+        await channel.send(embed=embed)
+
     @commands.command(name="delete")
     @commands.has_role(config.MATCH_MODERATOR)
     async def delete(self, ctx: Context, match_id: str = None):
@@ -46,6 +55,9 @@ class matchCommands(Cog):
             + f"V1/discord/delete-match?token={config.DISCORD_ROUTE_TOKEN}&match_id={match_id}"
         )
         response = await get_url(route=route)
+        await self.__log_command(
+            author_login=ctx.author.display_name, command="!delete", group_id=match_id
+        )
         await ctx.reply(response)
 
     @commands.command(name="getallmatches")
@@ -61,6 +73,11 @@ class matchCommands(Cog):
             output = "\n".join(response)
         else:
             output = ", ".join(response)
+        await self.__log_command(
+            author_login=ctx.author.display_name,
+            command="!getallmatches",
+            group_id=None,
+        )
         await ctx.reply(output)
 
     @commands.command(name="cleanup")
@@ -95,6 +112,9 @@ class matchCommands(Cog):
             + "\n*These matches have no data, and require an API restart to clear*"
             + "\n"
             + "\n".join(ghost)
+        )
+        await self.__log_command(
+            author_login=ctx.author.display_name, command="!cleanup", group_id=None
         )
         await ctx.reply(reply)
 
@@ -149,6 +169,10 @@ class matchCommands(Cog):
         buf = io.BytesIO(output.encode())
         cur_time = time.strftime(f"%Y%m%d%H%M%S")
         f = discord.File(buf, filename=f"{match_id}-{cur_time}.txt")
+
+        await self.__log_command(
+            author_login=ctx.author.display_name, command="!history", group_id=match_id
+        )
         await ctx.reply(file=f)
 
     @commands.command(name="info")
