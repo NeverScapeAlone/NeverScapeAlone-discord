@@ -88,6 +88,7 @@ class matchCommands(Cog):
         reply = (
             "**HEADLESS**"
             + "\n*These matches can be* `!deleted` *and joined.*"
+            + "\n"
             + "\n".join(headless)
             + "\n"
             + "\n**GHOST**"
