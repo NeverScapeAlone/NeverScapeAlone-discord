@@ -63,6 +63,30 @@ class matchCommands(Cog):
             output = ", ".join(response)
         await ctx.reply(output)
 
+    @commands.command(name="cleanup")
+    @commands.has_role(config.MATCH_MODERATOR)
+    async def cleanup(self, ctx: Context):
+        """[MATCH MODERATORS] get matches to clean up"""
+        all_matches_route = (
+            config.BASE
+            + f"V1/discord/get-all-matches?token={config.DISCORD_ROUTE_TOKEN}"
+        )
+        active_matches_route = (
+            config.BASE
+            + f"V1/discord/get-active-matches?token={config.DISCORD_ROUTE_TOKEN}"
+        )
+
+        managed_matches = await get_url(route=all_matches_route)
+        active_matches = await get_url(route=active_matches_route)
+        active_matches = json.dumps(active_matches)
+        active_matches = json.loads(active_matches)
+        active_matches = active_matches["active_matches_discord"]
+        active_IDs = [am["ID"] for am in active_matches]
+
+        await ctx.reply(
+            "\n".join([ID for ID in active_IDs if ID not in managed_matches])
+        )
+
     @commands.command(name="history")
     @commands.has_role(config.MATCH_MODERATOR)
     async def history(self, ctx: Context, match_id: str = None):
