@@ -1,5 +1,6 @@
 # modified from extreme4all's bot detector discord bot
 
+from ast import Expression
 import json
 import logging
 import random
@@ -146,11 +147,26 @@ class matchCommands(Cog):
 
         match_history = response["match_history"]
         lines = []
+
         for data in match_history:
             keys = data.keys()
             if "afk_cleanup" in keys:
                 out = data["afk_cleanup"]
                 middle = "afk"
+            elif "match_settings" in keys:
+                match_settings = data["match_settings"]
+                match_identifier = match_settings["match_id"]
+                activity = match_settings["activity"]
+                max_players = match_settings["max_players"]
+                is_private = match_settings["is_private"]
+                notes = match_settings["notes"]
+                match_version = match_settings["match_version"]
+                experience = match_settings["experience"]
+                split_type = match_settings["split_type"]
+                account_types = match_settings["account_types"]
+                regions = match_settings["regions"]
+                out = f"\n{match_version=}\n{match_identifier=} {activity=} {is_private=}\n{max_players=} {experience=} {split_type=}\n{account_types=} {regions=}\n{notes=}"
+                middle = "match_creation"
             elif "disconnect" in keys:
                 out = data["disconnect"]
                 middle = "disconnect"
@@ -171,7 +187,7 @@ class matchCommands(Cog):
                 plane = location_information["plane"]
                 world = location_information["world"]
                 login = location_payload["login"]
-                out = f"{login} @ ({x},{y}) | regionID: {regionID} [{regionX}, {regionY}, {plane}] on {world}"
+                out = f"{login} @ {regionID=}, {world=}"
                 middle = "location"
             elif "promote_request" in keys:
                 promote_request = data["promote_request"]
