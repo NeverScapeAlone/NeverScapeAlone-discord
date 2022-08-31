@@ -81,44 +81,6 @@ class matchCommands(Cog):
         )
         await ctx.reply(output)
 
-    @commands.command(name="cleanup")
-    @commands.has_role(config.MATCH_MODERATOR)
-    async def cleanup(self, ctx: Context):
-        """[MATCH MODERATORS] get matches to clean up"""
-        all_matches_route = (
-            config.BASE
-            + f"V1/discord/get-all-matches?token={config.DISCORD_ROUTE_TOKEN}"
-        )
-        active_matches_route = (
-            config.BASE
-            + f"V1/discord/get-active-matches?token={config.DISCORD_ROUTE_TOKEN}"
-        )
-
-        managed_matches = await get_url(route=all_matches_route)
-        active_matches = await get_url(route=active_matches_route)
-        active_matches = json.dumps(active_matches)
-        active_matches = json.loads(active_matches)
-        active_matches = active_matches["active_matches_discord"]
-        active_IDs = [am["ID"] for am in active_matches]
-
-        headless = [ID for ID in active_IDs if ID not in managed_matches]
-        ghost = [ID for ID in managed_matches if ID not in active_IDs if ID != "0"]
-        reply = (
-            "**HEADLESS**"
-            + "\n*These matches can be* `!deleted` *and joined.*"
-            + "\n"
-            + "\n".join(headless)
-            + "\n"
-            + "\n**GHOST**"
-            + "\n*These matches have no data, and require an API restart to clear*"
-            + "\n"
-            + "\n".join(ghost)
-        )
-        await self.__log_command(
-            author_login=ctx.author.display_name, command="!cleanup", group_id=None
-        )
-        await ctx.reply(reply)
-
     @commands.command(name="history")
     @commands.has_role(config.MATCH_MODERATOR)
     async def history(self, ctx: Context, match_id: str = None):
