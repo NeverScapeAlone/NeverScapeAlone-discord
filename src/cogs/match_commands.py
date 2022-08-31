@@ -157,6 +157,51 @@ class matchCommands(Cog):
             elif "successful_join" in keys:
                 out = data["successful_join"]
                 middle = "join"
+            elif "check_connection_request" in keys:
+                out = data["check_connection_request"]
+                middle = "connection_request"
+            elif "location" in keys:
+                location_payload = data["location"]
+                location_information = location_payload["location_information"]
+                x = location_information["x"]
+                y = location_information["y"]
+                regionX = location_information["regionX"]
+                regionY = location_information["regionY"]
+                regionID = location_information["regionID"]
+                plane = location_information["plane"]
+                world = location_information["world"]
+                login = location_payload["login"]
+                out = f"{login} @ ({x},{y}) | regionID: {regionID} [{regionX}, {regionY}, {plane}] on {world}"
+                middle = "location"
+            elif "promote_request" in keys:
+                promote_request = data["promote_request"]
+                submitting_player = promote_request["submitting_player"]
+                subject_player = promote_request["subject_player"]
+                out = f"{submitting_player} wants to promote {subject_player}"
+                middle = "promote_request"
+            elif "promoted" in keys:
+                promoted = data["promoted"]
+                submitting_player = promoted["submitting_player"]
+                subject_player = promoted["subject_player"]
+                out = f"{submitting_player} promoted {subject_player}"
+                middle = "promotion"
+            elif "kick_request" in keys:
+                kick_request = data["kick_request"]
+                submitting_player = kick_request["submitting_player"]
+                subject_player = kick_request["subject_player"]
+                out = f"{submitting_player} wants to kick {subject_player}"
+                middle = "kick_request"
+            elif "kicked" in keys:
+                kicked = data["kicked"]
+                submitting_player = kicked["submitting_player"]
+                subject_player = kicked["subject_player"]
+                out = f"{submitting_player} kicked {subject_player}"
+                middle = "kicked"
+            elif "forceful_socket_disconnect" in keys:
+                forceful_socket_disconnect = data["forceful_socket_disconnect"]
+                player = forceful_socket_disconnect["login"]
+                out = f"{player}"
+                middle = "forceful_socket_disconnect"
             else:
                 out = None
             if not out:
