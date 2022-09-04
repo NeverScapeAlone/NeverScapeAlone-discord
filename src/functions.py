@@ -18,7 +18,7 @@ async def post_url(route, data):
 
 
 async def check_match_id(match_id: str) -> bool:
-    if re.fullmatch("^[a-z]{4,7}-[a-z]{4,7}-[a-z]{4,7}-[a-z]{4,7}", match_id):
+    if re.fullmatch("^[a-z]{4,7}-[a-z]{4,7}-[a-z]{4,7}", match_id):
         return True
     return False
 
