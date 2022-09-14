@@ -10,3 +10,5 @@ services:
       - "6000:6000"
     env_file:
       - .env
+    volumes:
+      - /home/ubuntu/discord/logs:/code/logs:rw
