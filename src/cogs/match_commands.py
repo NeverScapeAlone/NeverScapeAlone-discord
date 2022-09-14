@@ -121,7 +121,7 @@ class matchCommands(Cog):
                 activity = match_settings["activity"]
                 max_players = match_settings["max_players"]
                 is_private = match_settings["is_private"]
-                RuneGuard = match_settings["RuneGuard"]
+                RuneGuard = None  # match_settings["RuneGuard"]
                 notes = match_settings["notes"]
                 match_version = match_settings["match_version"]
                 experience = match_settings["experience"]
