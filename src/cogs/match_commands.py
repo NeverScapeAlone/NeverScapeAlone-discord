@@ -39,7 +39,7 @@ class matchCommands(Cog):
         )
         await channel.send(embed=embed)
 
-    @commands.command(name="delete")
+    @commands.hybrid_command(name="delete")
     @commands.has_role(config.MATCH_MODERATOR)
     async def delete(self, ctx: Context, match_id: str = None):
         """[MATCH MODERATORS] delete a match"""
@@ -61,7 +61,7 @@ class matchCommands(Cog):
         )
         await ctx.reply(response)
 
-    @commands.command(name="getallmatches")
+    @commands.hybrid_command(name="getallmatches")
     @commands.has_role(config.MATCH_MODERATOR)
     async def getallmatches(self, ctx: Context, compress=1):
         """[MATCH MODERATORS] Get all matches"""
@@ -81,7 +81,7 @@ class matchCommands(Cog):
         )
         await ctx.reply(output)
 
-    @commands.command(name="history")
+    @commands.hybrid_command(name="history")
     @commands.has_role(config.MATCH_MODERATOR)
     async def history(self, ctx: Context, match_id: str = None):
         """[MATCH MODERATORS] get the history of a match"""
@@ -198,7 +198,7 @@ class matchCommands(Cog):
         )
         await ctx.reply(file=f)
 
-    @commands.command(name="info")
+    @commands.hybrid_command(name="info")
     async def info(self, ctx: Context, match_id: str = None):
         """get the current information for a match"""
         if not match_id:

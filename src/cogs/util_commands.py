@@ -41,7 +41,7 @@ class utilCommands(Cog):
             return login
         return None
 
-    @commands.command(name="poke")
+    @commands.hybrid_command(name="poke")
     async def poke(self, ctx: Context):
         """Poke the server to determine latency"""
         debug = {
@@ -60,10 +60,9 @@ class utilCommands(Cog):
         await ctx.reply(embed=embed)
         pass
 
-    @commands.command(name="whois")
-    async def whois(self, ctx: Context, *login: str):
+    @commands.hybrid_command(name="whois")
+    async def whois(self, ctx: Context, login: str):
         """Finding the discord username of a player's RSN in-game."""
-        login = " ".join(list(login))
         if not login:
             await ctx.reply("You must enter an RSN.")
         login = await self.__validate_rsn(login)
@@ -78,7 +77,7 @@ class utilCommands(Cog):
         response = await get_url(route=route)
         await ctx.reply(response)
 
-    @commands.command(name="events")
+    @commands.hybrid_command(name="events")
     async def events(self, ctx: Context):
         """un/subscribe to the events channel"""
         event_role = ctx.guild.get_role(config.EVENTS_ROLE)
@@ -96,7 +95,7 @@ class utilCommands(Cog):
             await ctx.reply("You have been subscribed to events!")
             return
 
-    @commands.command(name="logs")
+    @commands.hybrid_command(name="logs")
     async def logs(self, ctx: Context):
         """Tips on how to access your client.log file"""
         response = (
@@ -111,7 +110,7 @@ class utilCommands(Cog):
         embed = embed.add_field(name="Finding your client.log file", value=response)
         await ctx.reply(embed=embed)
 
-    @commands.command(name="ip")
+    @commands.hybrid_command(name="ip")
     async def ip(self, ctx: Context):
         """A helpful link for why the plugin needs your IP address"""
         embed = discord.Embed(
@@ -123,7 +122,7 @@ class utilCommands(Cog):
         )
         await ctx.reply(embed=embed)
 
-    @commands.command(name="newplayer")
+    @commands.hybrid_command(name="newplayer")
     async def newplayer(self, ctx: Context):
         """A link for new players"""
         embed = discord.Embed(color=10181046, title="🆕 New Player 🆕")
@@ -133,7 +132,7 @@ class utilCommands(Cog):
         )
         await ctx.reply(embed=embed)
 
-    @commands.command(name="report")
+    @commands.hybrid_command(name="report")
     async def report(self, ctx: Context):
         """Report another player, or an issue with your match."""
         embed = discord.Embed(color=10038562, title="Report another Player")
@@ -154,7 +153,7 @@ class utilCommands(Cog):
         )
         await ctx.reply(embed=embed)
 
-    @commands.command(name="bug")
+    @commands.hybrid_command(name="bug")
     async def bug(self, ctx: Context):
         """Report a bug, or an issue with your plugin."""
         embed = discord.Embed(color=10181046, title="Bug Report")
@@ -170,7 +169,7 @@ class utilCommands(Cog):
         )
         await ctx.reply(embed=embed)
 
-    @commands.command(name="meow")
+    @commands.hybrid_command(name="meow")
     async def meow(self, ctx: Context):
         """Send a random cat image."""
         debug = {

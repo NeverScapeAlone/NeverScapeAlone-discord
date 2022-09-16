@@ -84,7 +84,7 @@ class managementCommands(Cog):
             parsed.append((title, description))
         return version, parsed
 
-    @commands.command(name="update")
+    @commands.hybrid_command(name="update")
     @commands.has_role(config.OWNER_ROLE)
     async def update(self, ctx: Context):
         """[OWNER] update the API"""
@@ -102,7 +102,7 @@ class managementCommands(Cog):
 
         await ctx.reply(embed=embed)
 
-    @commands.command(name="top10")
+    @commands.hybrid_command(name="top10")
     @commands.has_role(config.OWNER_ROLE)
     async def top10(self, ctx: Context):
         """[OWNER] Get the top10 issues for development on github"""
@@ -130,7 +130,7 @@ class managementCommands(Cog):
                 break
         await ctx.reply(embed=embed)
 
-    @commands.command(name="parse")
+    @commands.hybrid_command(name="parse")
     @commands.has_any_role(config.MATCH_MODERATOR, config.OWNER_ROLE, config.STAFF)
     async def parse(self, ctx: Context, verbose=False):
         """[OWNER, MATCH MODERATOR, STAFF] quickly parses a client.log file"""

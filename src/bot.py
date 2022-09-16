@@ -47,6 +47,8 @@ async def on_ready():
     await bot.add_cog(matchCommands(bot))
     await bot.add_cog(managementCommands(bot))
 
+    await bot.tree.sync()
+
     channel = bot.get_channel(config.DISCORD_ALERT_CHANNEL)
     current_time = int(time.time())
     embed = discord.Embed(
