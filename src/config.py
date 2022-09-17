@@ -30,7 +30,7 @@ TICKET_BOT = 992456721341628429
 
 COMMAND_PREFIX = "!"
 # BASE = "http://127.0.0.1:8000/"
-BASE = "http://touchgrass.online:5500/"
+BASE = "http://neverscapealone.com:5500/"
 
 # setup logging
 file_handler = logging.FileHandler(filename="logs/error.log", mode="a")
