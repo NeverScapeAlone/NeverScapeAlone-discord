@@ -30,7 +30,7 @@ EVENTS_ROLE = 1013161519460143184
 # users
 TICKET_BOT = 992456721341628429
 
-COMMAND_PREFIX = "$"
+COMMAND_PREFIX = "!"
 # BASE = "http://127.0.0.1:8000/"
 BASE = "http://neverscapealone.com:5500/"
 
