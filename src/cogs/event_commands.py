@@ -1,23 +1,12 @@
 # modified from extreme4all's bot detector discord bot
 
-from ast import Expression
-import json
 import logging
-import random
-import re
-import subprocess
-import time
-from types import NoneType
-import time
-import io
+import datetime
 
 import discord
 import src.config as config
-import src.models as models
 from discord.ext import commands
 from discord.ext.commands import Cog, Context
-from discord.app_commands import checks
-from src.functions import check_match_id, get_url, post_url, AttrDict
 
 logger = logging.getLogger(__name__)
 
@@ -30,12 +19,34 @@ class eventCommands(Cog):
         """
         self.bot = bot
 
-    @commands.command(name="random")
-    @commands.has_role(config.EVENT_MODERATOR)
-    async def random(self, ctx: Context, time_start: str):
-        """[EVENT MODERATORS] create a random event"""
+    async def __announce_event_command(self, event_object):
+        channel = self.bot.get_channel(config.EVENT_ANNOUNCEMENT_CHANNEL)
+        await channel.send(f"<@{config.EVENTS_ROLE}>")
+        await channel.send(event_object.url)
 
-    @commands.command(name="start")
+    @commands.hybrid_command(name="create_event")
     @commands.has_role(config.EVENT_MODERATOR)
-    async def start(self, ctx: Context, activity: str, time_start: str):
+    async def start(
+        self,
+        ctx: Context,
+        event_name: str,
+        description: str,
+        location: str,
+        friends_chat: str,
+        start_time: int,
+        end_time: int,
+    ):
         """[EVENT MODERATORS] create an event"""
+        start = datetime.datetime.fromtimestamp(start_time).astimezone()
+        end = datetime.datetime.fromtimestamp(end_time).astimezone()
+        event_object = await ctx.guild.create_scheduled_event(
+            name=event_name,
+            description=f"FC: {friends_chat} - " + description,
+            location=location,
+            start_time=start,
+            end_time=end,
+        )
+        await ctx.reply(f"Check <#{config.EVENT_ANNOUNCEMENT_CHANNEL}> for the event!")
+        await self.__announce_event_command(
+            event_object=event_object,
+        )

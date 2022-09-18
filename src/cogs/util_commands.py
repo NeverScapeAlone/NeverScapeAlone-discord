@@ -5,6 +5,7 @@ import random
 
 import re
 import discord
+import time
 from discord.ext import commands
 from src.functions import get_url, post_url, check_match_id
 from discord.ext.commands import Context, Cog
@@ -59,6 +60,27 @@ class utilCommands(Cog):
         embed.add_field(name="Status", value=f"{isServerUp}", inline=False)
         await ctx.reply(embed=embed)
         pass
+
+    @commands.hybrid_command(name="utc")
+    async def utc(
+        self,
+        ctx: Context,
+        dyear: int = 0,
+        dmonth: int = 0,
+        dday: int = 0,
+        dhour: int = 0,
+        dminute: int = 0,
+        dsecond: int = 0,
+    ):
+        """gets the current unix timestamp"""
+        t = int(time.time())
+        t += dsecond
+        t += dminute * 60
+        t += dhour * 60 * 60
+        t += dday * 60 * 60 * 24
+        t += dmonth * 60 * 60 * 24 * 30
+        t += dyear * 60 * 60 * 24 * 30 * 365
+        await ctx.reply(t)
 
     @commands.hybrid_command(name="whois")
     async def whois(self, ctx: Context, login: str):
