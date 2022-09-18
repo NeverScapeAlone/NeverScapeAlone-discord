@@ -121,14 +121,18 @@ class matchCommands(Cog):
                 activity = match_settings["activity"]
                 max_players = match_settings["max_players"]
                 is_private = match_settings["is_private"]
+                RuneGuard = None  # match_settings["RuneGuard"]
                 notes = match_settings["notes"]
                 match_version = match_settings["match_version"]
                 experience = match_settings["experience"]
                 split_type = match_settings["split_type"]
                 account_types = match_settings["account_types"]
                 regions = match_settings["regions"]
-                out = f"\n{match_version=}\n{match_identifier=} {activity=} {is_private=}\n{max_players=} {experience=} {split_type=}\n{account_types=} {regions=}\n{notes=}"
+                out = f"\n{match_version=}\n{match_identifier=} {activity=} {is_private=}\n {RuneGuard=} {max_players=} {experience=}\n {split_type=} {account_types=} {regions=}\n{notes=}"
                 middle = "match_creation"
+            elif "chat" in keys:
+                out = data["login"] + " : " + data["message"]
+                middle = "chat"
             elif "disconnect" in keys:
                 out = data["disconnect"]
                 middle = "disconnect"

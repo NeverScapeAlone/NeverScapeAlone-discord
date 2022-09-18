@@ -18,6 +18,7 @@ from src.cogs.util_commands import utilCommands
 from src.cogs.verification_commands import verificationCommands
 from src.cogs.match_commands import matchCommands
 from src.cogs.management_commands import managementCommands
+from src.cogs.event_commands import eventCommands
 
 logger = logging.getLogger(__name__)
 
@@ -41,8 +42,10 @@ bot: discord.Client = Bot(
 @bot.event
 async def on_ready():
     logger.info(f"We have logged in as {bot.user}")
+
     bot.Session = aiohttp.ClientSession()
     await bot.add_cog(utilCommands(bot))
+    await bot.add_cog(eventCommands(bot))
     await bot.add_cog(verificationCommands(bot))
     await bot.add_cog(matchCommands(bot))
     await bot.add_cog(managementCommands(bot))
