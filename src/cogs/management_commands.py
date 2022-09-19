@@ -2,16 +2,13 @@
 
 import json
 import logging
-from types import NoneType
 import re
 
 import discord
 import src.config as config
-import src.models as models
 from discord.ext import commands
 from discord.ext.commands import Cog, Context
-from discord.app_commands import checks
-from src.functions import check_match_id, get_url, post_url
+from src.functions import get_url
 
 import codecs
 import re
