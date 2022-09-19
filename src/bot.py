@@ -1,20 +1,17 @@
 import json
 import logging
 import time
-from typing import List, Optional, Text
 
 import aiohttp
 import discord
-from discord.app_commands import checks, commands, tree
 from discord.ext import tasks
 from discord.ext.commands import Bot
-from pydantic import BaseModel
-import traceback
 
 import src.models as models
 from src import config
-from src.functions import get_url, post_url, check_match_id
+from src.functions import get_url, post_url
 from src.cogs.util_commands import utilCommands
+from src.cogs.role_commands import roleCommands
 from src.cogs.verification_commands import verificationCommands
 from src.cogs.match_commands import matchCommands
 from src.cogs.management_commands import managementCommands
@@ -45,6 +42,7 @@ async def on_ready():
 
     bot.Session = aiohttp.ClientSession()
     await bot.add_cog(utilCommands(bot))
+    await bot.add_cog(roleCommands(bot))
     await bot.add_cog(eventCommands(bot))
     await bot.add_cog(verificationCommands(bot))
     await bot.add_cog(matchCommands(bot))
@@ -57,6 +55,7 @@ async def on_ready():
     embed = discord.Embed(
         colour=1752220, title=f"Started <t:{current_time}:R> on <t:{current_time}:F>"
     )
+
     await channel.send(embed=embed)
     run_queues.start()
     manage_channels.start()
